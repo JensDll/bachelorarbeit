@@ -1,0 +1,53 @@
+\chapter{Einleitung}
+Hören die meisten Personen die Begriffe \enquote{Künstliche Intelligenz}
+und \enquote{Maschinelles Lernen} stellen sie sich Roboter vor:
+treue Diener, die all deine Aufgaben übernehmen oder eine tödliche Arme
+von superintelligenten Cyborgs im Kampf gegen die Menschheit.
+Künstliche Intelligenz (kurz KI) ist jedoch schon lange nicht mehr nur eine futuristische
+Fantasie und Teil von Science-Fiction-Filmen; sie wird bereits großflächig
+verwendet und findet Einsatz in einer Vielzahl von Anwendungen aus Bereichen
+in nahe zu allen Teilen der Wirtschaft. Andrew Ng,
+welcher unteranderem durch seine beliebten Onlinekurse zum Thema
+Maschinellen Lernen (ML) und Deep Learning (DL)
+bekannt ist,
+\footnote{\url{https://www.coursera.org/instructor/andrewng}}
+vergleicht KI mit der neuen Elektrizität.
+\begin{aquote}{Andrew Ng \parencite{online:ai-andrew-ng}}
+  \enquote{\textit{Just as electricity transformed almost everything 100 years ago,
+      today I actually have a hard time thinking
+      of an industry that I don’t think AI will
+      transform in the next several years}}
+\end{aquote}
+Die Anwendung, mit der ML erstmalig öffentliche Aufmerksamkeit
+erlangt und das täg\-liche Leben vieler Menschen beeinflusst, stammt aus den 90er-Jahren:
+Die Rede ist von den E-Mail-Spamfiltern \parencite[1]{book:hands-on-ml}.
+Es handelt sich um eine scheinbar leichte Aufgabe, welche
+mit traditioneller Programmierung aber dennoch nur schwer gelöst werden kann.
+Ein klassisches Programm besteht aus vielen statischen Regeln,
+im Fall des Spamfilters können diese dazu dienen, auffällige Schlüsselwörter und
+Satzteile zu erkennen (z.\,B. \enquote{Kreditkarte}, \enquote{konstenlos}, \enquote{kaufen} usw).
+Ein statisches Programm ist nicht gut dafür geeignet, ein dynamisches Problem
+zu beschreiben. Die Absender der Spamnachrichten könnten erkennen, welche E-Mails blockiert werden
+und diese leicht abändern. Arbeiten sie so um das Problem herum,
+müssen immer wieder neue Regeln im Programm aufgenommen werden. Ein Spamfilter hingegen,
+welcher auf Maschinellen Lernen basiert, kann diese Regeln
+selbstständig erkennen.
+Im Training verwendet der Algorithmus hierfür Beispiel E-Mails
+(z.\,B. diese, die vom Benutzer markiert wurden), diese Daten nennt man dann den
+Trainingsdatensatz.
+Es folgt ein Programm, welches weitaus kürzer,
+einfacher zu verwalten und wahrscheinlich auch präziser ist.
+
+\section{Was ist Maschinelles Lernen?}
+Maschinelles Lernen ist die Wissenschaft (und Kunst) der Programmierung,
+die es dem Computer ermöglicht, von Daten zu lernen. Arthur Samuel und Tom Mitchell
+haben im Jahr 1959 und 1997 eine allgemeine und formale Definition gegeben \parencite[2]{book:hands-on-ml}:
+\begin{aquote}{Arthur Samuel, 1959}
+  \enquote{\textit{Machine Learning is the field of study that gives computers
+      the abilty to learn without being explicitly programmed.}}
+\end{aquote}
+\begin{aquote}{Tom Mitchell, 1997}
+  \enquote{\textit{A computer program is said to learn from experience
+      $E$ with respect to some task \,$T$ and some performance measure $P$,
+      if its performance on $T$, as measured by $P$, improves with experience $E$.}}
+\end{aquote}

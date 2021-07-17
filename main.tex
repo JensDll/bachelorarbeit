@@ -1,0 +1,61 @@
+\documentclass[
+  ngerman,
+  a4paper,
+  12pt
+]{report}
+
+\usepackage{layouts}
+\usepackage[utf8]{inputenc}
+\usepackage[english, german]{babel}
+\usepackage[left=2.5cm, right=2.5cm]{geometry}
+\usepackage{csquotes}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{framed}
+\usepackage{siunitx}
+\usepackage{xparse}
+
+\usepackage[unicode]{hyperref}
+\hypersetup{
+  % colorlinks = true,
+  linkcolor = Red,
+  filecolor = Magenta,      
+  urlcolor = Green,
+  citecolor = Cyan
+}
+
+\usepackage[style = authoryear-ibid]{biblatex}
+\addbibresource{general/main.bib}
+
+\usepackage{graphicx}
+\graphicspath{{./images}}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning, calc, arrows.meta, arrows}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.5}
+
+\input{general/listing.tex}
+
+\input{general/mdframed.tex}
+
+\NewDocumentEnvironment{aquote}{m}
+  {\begin{quote}}
+  {\\\hspace*{16pt}--- #1\end{quote}}
+
+\begin{document}
+\pagenumbering{Roman}
+\include{general/titlepage}
+\onehalfspacing
+\include{general/erklärung.tex}
+\include{general/abstract.tex}
+\tableofcontents
+% \listoffigures
+% \lstlistoflistings
+\newpage
+\pagenumbering{arabic}
+\include{chapters/einleitung/index.tex}
+
+\printbibliography
+\end{document}
