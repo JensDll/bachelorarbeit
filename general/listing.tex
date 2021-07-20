@@ -1,3 +1,25 @@
 \usepackage{listings}
 \renewcommand{\lstlistingname}{Quelltext}
 \renewcommand{\lstlistlistingname}{Quelltextverzeichnis}
+
+\newcommand{\colorClasses}{\color{PineGreen}}
+\newcommand{\colorInterfaces}{\color{DarkOrchid}}
+\newcommand{\colorMethods}{\color{Orange}}
+\newcommand{\colorKeyword}{\color{blue}}
+
+\lstdefinelanguage[]{mypy}[]{Python}{
+  escapechar=@,
+  morekeywords={as},
+  showstringspaces=false,
+  keywordstyle=\color{blue},
+  basicstyle={\scriptsize\fontencoding{T1}\fontfamily{fvm}\selectfont},
+  stringstyle=\color{orange},
+  % moredelim=[is][\color{black}]{|}{|}
+}
+
+\lstset{
+  columns=fullflexible,
+  language=mypy,
+  xleftmargin=2em
+}
+

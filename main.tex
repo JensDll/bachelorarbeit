@@ -14,12 +14,15 @@
 \usepackage{framed}
 \usepackage{siunitx}
 \usepackage{xparse}
+\usepackage[dvipsnames]{xcolor}
+
+\usepackage{amsmath}
 
 \usepackage[unicode]{hyperref}
 \hypersetup{
   % colorlinks = true,
   linkcolor = Red,
-  filecolor = Magenta,      
+  filecolor = Magenta,
   urlcolor = Green,
   citecolor = Cyan
 }
@@ -36,9 +39,9 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.5}
 
-\input{general/listing.tex}
-
 \input{general/mdframed.tex}
+\input{general/listing.tex}
+\input{general/commands.tex}
 
 \NewDocumentEnvironment{aquote}{m}
   {\begin{quote}}
