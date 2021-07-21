@@ -95,7 +95,7 @@ Spamfilters vom Benutzer stammen oder durch Naturgesetzte und Expertenwissen
 gegeben sein. Diese Daten werden im System als Label bezeichnet.
 Wir können nun die einzelnen Lernmethoden etwas genauer untersuchen.
 
-\subsection{Überwachtes Lernen}
+\paragraph{Klassifizierung versus Regression}
 Das bisherige Spamfilter Beispiel ist ein typisches
 Klassifizierungsproblem. Zu einer Menge von eine Eingabewerten
 (auch genannt Features) soll die Wahrscheinlichkeit bestimmt werden,
@@ -113,10 +113,10 @@ rng = np.random.default_rng(42)
 x = 6 * rng.random((100, 1))
 y = 5 + 3 * x
 \end{lstlisting}
-NumPy ist eine Python Bibliothek, welche das effiziente Rechnen mit
-multidimensionalen Daten ermöglicht, zum Beispiel der Vektor- und Matrixmultiplikation.
+NumPy ist eine Python Bibliothek, welche effizientes Rechnen mit
+multidimensionalen Daten ermöglicht (z.\,B. der Vektor- und Matrixmultiplikation).
 \footnote{\url{https://numpy.org/doc/stable/user/whatisnumpy.html\#what-is-numpy}}
-Operationen in NumPy werden immer elementweise durchgeführt, der folgende Programmausschnitt
+Operationen in NumPy werden immer elementweise durchgeführt. Der folgende Programmausschnitt
 zeigt dieses Verhalten:
 \begin{lstlisting}
 >>> a = np.array([1, 2, 3])
@@ -125,9 +125,18 @@ array([1, 2, 3])
 >>> a * 3
 array([3, 6, 9])
 \end{lstlisting}
-CPUs und GPUs sind sehr gut darin diese Art der Berechungen durchzuführen,
+CPUs und GPUs sind sehr gut darin, diese Art der Berechnungen durchzuführen,
 was NumPy sehr viel schneller macht als die Verwendung einer expliziten Schleife.
-Wir können nun die eben generierten Daten anzeigen und verwenden hierfür
+Die Technik, nicht mehr mit skalaren Werten zu rechnen,
+nennt sich Vektorisierung und kann
+die Laufzeit eines rechenintensiven Algorithmus,
+wie sie in der KI zum Einsatz kommen, drastisch verringern.
+\begin{aquote}{\parencite{online:vectorization}}
+  \enquote{\textit{Vectorization is the process of converting an algorithm
+      from operating on a single value at a time to
+      operating on a set of values (vector) at one time}}
+\end{aquote}
+Wir können nun die zuvor generierten Daten visualisieren und verwenden hierfür
 eine weitere Python Bibliothek mit dem Namen Matplotlib:
 \footnote{\url{https://matplotlib.org/stable/index.html}}
 \begin{lstlisting}
@@ -147,7 +156,7 @@ Die hieraus resultierende Grafik ist in \autoref{plot:linear-data} zu sehen.
   \label{plot:linear-data}
 \end{figure}
 \noindent
-Die Daten sehen sehr gerade aus, damit das Problem nicht zu einfach
+Die Daten sehen sehr gerade aus, damit das Problem nicht zu einfach ist
 addieren auf Seiten der $y$ Werte zufälliges Rauschen.
 \begin{lstlisting}
 y += 3 * rng.standard_normal((100, 1))
@@ -189,7 +198,7 @@ und \lstinline{coef_}:
 \end{lstlisting}
 Nicht schlecht: Das Modell vermutet $\yhat = 4.85 + 3.04x_1$, wobei die ursprünglich
 Funktion $y = 5 + 3x_1 + r$ war. Die genauen Werte konnten aufgrund des Rauschens
-nicht gewonnen werden. Die Regressionsgerade zusammen mit den Daten ist
+nicht wiedergewonnen werden. Die Regressionsgerade ist
 in \autoref{plot:linear-data-prediction} zu sehen.
 \begin{figure}[!h]
   \centering
@@ -198,4 +207,30 @@ in \autoref{plot:linear-data-prediction} zu sehen.
   \label{plot:linear-data-prediction}
 \end{figure}
 
-\subsection{Unüberwachtes Lernen}
+\paragraph{Batch und Online Lernen}
+Ein weiterer Punkt, anhand dessen ein KI-System unterschieden
+werden kann, ist die Methode wie es Daten verarbeitet \parencite[15]{book:hands-on-ml}.
+Dieser Unterschied nennt sich Batch und Online Lernen.
+Beim Batch Lernen werden Daten stapelweise verarbeitet.
+Das Modell bzw. die Parameter werden erst dann angepasst,
+nachdem der gesamte Stapel (Batch) das Training durchlaufen hat.
+Dies braucht in der Regel viel Zeit und Speicherkapazität, weshalb
+es typischerweise offline durchgeführt wird.
+Nachdem ein System veröffentlicht wurde, wendet es, dass an, was es gelernt hat,
+kann aber keine neuen Schlüsse mehr ziehen.
+Soll das System auf neue Daten reagieren, muss ein neues Modell trainiert werden.
+Das Online Lernen funktioniert anders.
+Im Training werden die Daten nicht stapelweise verarbeitet,
+sondern einzeln nacheinander.
+Dies spart Zeit und Platz und kann hilfreich sein, wenn es darum geht,
+mit sehr großen Datensätzen zu trainieren, die nicht alle gleichzeitig
+in den Speicher passen würden.
+Ein weiterer Vorteil ist der, dass neue Daten spontan auf dem Weg
+verarbeitet werden können. Online Lernen eignet sich also gut,
+um kontinuierliche Daten zu analysieren (z.\,B. Aktienkurse).
+
+\section{Beschreibung des Problems}
+In dieser Bachelorarbeit geht es um Maschinelles Lernen auf mobilen Geräten.
+Zu Beginn der Arbeit stellte sich der Autor die Frage:
+Wie kann ein System entwickelt werden mit dem verschiedene KI-Modelle
+verwaltet, welches modular und einfach erweiterbar ist.
