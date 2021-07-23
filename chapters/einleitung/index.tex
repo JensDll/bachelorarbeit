@@ -63,6 +63,7 @@ werden. Dieser Maßstab heißt Genauigkeit und wird
 häufig verwendet wenn es darum geht eine Klassifizierungsaufgabe zu bewerten.
 
 \section{Die unterschiedlichen Lernmethoden}
+\label{sec:lernmethoden}
 Maschinelles Lernen kann genutzt werden, um eine Vielzahl von Problemen zu lösen.
 Dies macht es zu einem mächtigen Werkzeug, aber auch eines, in dem es schwierig sein
 kann, den Überblick zu behalten.
@@ -244,18 +245,17 @@ speziellen Form von KI-Systemen beschäftigen: diese sind künstliche
 neuronale Netze. Die Natur hat bereits eine unzählige Menge von Erfindungen
 inspiriert, es liegt daher nahe, die Funktionsweise des Gehirns zu
 untersuchen, um ein intelligentes System zu entwickeln.
-Der Trainingsprozess eines neuronalen Netzes nennt sich Deep Learning (DL).
-Die technische Idee von DL ist bereits mehrere
-Jahrzehnte bekannt:
+Der Prozess, ein neuronales Netz zu trainieren, nennt sich Deep Learning (DL).
+DL ist keine neue Idee:
 Der Neurophysiologie Warren McCulloch und der Mathematiker Walter Pitts
 haben das Prinzip im Jahr 1943 erstmalig öffentlich eingeführt
 \parencite[280]{book:hands-on-ml}. Der frühe Erfolg von neuralen
 Netzen brachte Enthusiasmus und große Erwartungen,
 doch als sich in den 70er-Jahren herausstellte, dass diese Erwartungen nicht erfüllt
-werden können, verlangsamte sich die Forschung und die finanziellen Fördermittel
+werden können, verlangsamte sich die Forschung und die Fördermittel
 wurden weniger \parencite[280]{book:hands-on-ml}.
 Es ist nur kürzlich, dass neuronale Netze einen neuen Aufschwung erleben
-und dies nicht nur eine Wiederholung der Vergangenheit ist.
+und dies wahrscheinlich nicht mehr eine Wiederholung der Vergangenheit ist.
 Die folgenden Punkte begründen diese Vermutung \parencite[280]{book:hands-on-ml}:
 \begin{itemize}
   \item Durch die immer stärker digitalisierte Welt
@@ -265,14 +265,9 @@ Die folgenden Punkte begründen diese Vermutung \parencite[280]{book:hands-on-ml
         zu anderen Lernverfahren, wessen Performanz ab einer bestimmten
         Datenmenge typischerweise begrenzt ist.
   \item Rechenstarke CPUs und GPUs machen es möglich, auch große neuronale Netze
-        schnell zu trainieren. Der Trainingsprozess eines neuronalen
+        schnell zu trainieren. Das Training eines neuronalen
         Netzes ist ein sehr iterativer Prozess.
-        \begin{figure}[!h]
-          \centering
-          \input{chapters/einleitung/tikz/train-circle.tex}
-          \caption{Der Trainingsprozess eines neuronalen Netzes}
-          \label{fig:nn-training-process}
-        \end{figure}
+        \input{chapters/einleitung/tikz/train-circle.tex}
         Es beginnt häufig mit einer Idee,
         gefolgt von der Umsetzung und anschließenden Experimenten, um die ursprüngliche
         Idee zu bessern.
@@ -282,5 +277,48 @@ Die folgenden Punkte begründen diese Vermutung \parencite[280]{book:hands-on-ml
   \item Es gibt bereits viele hervorragende Anwendungen, die zeigen,
         wie gut neuronale Netze funktionieren, um komplexe Probleme zu lösen.
 \end{itemize}
+Der Versuch, ein neuronales Netz von Beginn an neu aufzubauen,
+würde eine Menge Arbeit in Anspruch nehmen.
+Glücklicherweise können viele der komplexesten Schritte
+(wie die Implementierung des Backpropagation-Algorithmus)
+automatisiert werden und es gibt eine Menge von
+Deep-Learning-Frameworks, welche diese Aufgabe übernehmen.
+Das populärste Deep-Learning-Framework (in Bezug auf Verweise in Forschungsarbeiten,
+GitHub-Sterne, Verwendung in Firmen usw.) trägt den Namen TensorFlow
+\parencite[376]{book:hands-on-ml}.
+Es wurde von Google entwickelt und ist seit November 2015
+ein Open-Source-Projekt \parencite[376]{book:hands-on-ml}.
+Es besitzt eine ähnliche API wie NumPy und Scikit-Learn
+aus \autoref{sec:lernmethoden}, mit zusätzlicher
+GPU Unterstützung und Deep Learning Fokussierung.
+Die restlichen Beispiele dieser
+Arbeit werden die TensorFlow Bibliothek verwenden.
+
+\section{Deep Learning mit mobile Geräten}
 Maschinelles Lernen auf mobilen Geräten bringt einige
-zusätzlichen Herausforderungen mit sich.
+zusätzliche Herausforderungen mit sich.
+Ein großes neuronales Netz mit vielen lernbaren
+Parametern (im acht- bis neunstelligen Bereich) kann eine Dateigröße von
+\qty{100}{\mega\byte} schnell überschreiten.
+Solch ein großes Modell braucht lange, um es herunterzuladen,
+verwendet viel RAM und CPU und all dies macht die Anwendung langsam,
+erhitzt das Gerät und verbraucht schnell die Batterie \parencite[685]{book:hands-on-ml}.
+Es wird eine Lösung benötigt, die ein Modell mobilfreundlich,
+effizient und kleiner macht, ohne dabei zu viel Genauigkeit einzubüßen.
+Die TensorFlow Lite Bibliothek (TFLite)
+bietet verschiedene Werkzeuge an, um ein Modell auf mobilen und eingebetteten
+Systemen bereitzustellen, mit den folgenden drei Zielen \parencite[685]{book:hands-on-ml}:
+\begin{itemize}
+  \item Reduzieren der Modellgröße für kürzere Downloadzeiten und
+        kleinere RAM Nutzung.
+  \item Reduzieren der nötigen Rechenleistung, um eine Prognose durchzuführen,
+        für weniger Verzögerung, Batterieverbrauch und Hitzeentwicklung.
+  \item Anpassen des Modells an gerätespezifische Einschränkungen.
+\end{itemize}
+Der genaue Ablauf, wie ein Modell in das TensorFlow Lite
+spezifische Format umgewandelt wird, wird im nächsten Kapitel
+näher untersucht.
+Das Gerät, welches in dieser Arbeit verwendet wird, ist der Siemens SIMATIC
+IOT2050. Es ist von Aufbau und Kapazität ähnlich wie ein Raspberry Pi
+und wird mit Netzteil betrieben.
+\input{chapters/einleitung/tikz/compare.tex}
