@@ -75,7 +75,7 @@ Kriterien \parencite[7]{book:hands-on-ml}:
         die Rede von überwachten und unüberwachten Lernen.
   \item Kann das System inkrementell mit einer Teilmenge der Trainingsdaten
         lernen oder verwendet es die gesamten Daten. Dieser Unterschied
-        nennt sich \textit{online} vs. \textit{batch} Lernen.
+        nennt sich Online- vs. Batch-Learning.
   \item Funktioniert das System indem es lediglich neue Daten mit
         alten vergleicht oder kann es Muster erkennen, um beispielsweise
         einen Datensatz in Klassen zu unterteilen.
@@ -121,9 +121,9 @@ zeigt dieses Verhalten:
 \begin{lstlisting}
 >>> a = np.array([1, 2, 3])
 >>> a
-array([1, 2, 3])
+°array([1, 2, 3])°
 >>> a * 3
-array([3, 6, 9])
+°array([3, 6, 9])°
 \end{lstlisting}
 CPUs und GPUs sind sehr gut darin, diese Art der Berechnungen durchzuführen,
 was NumPy sehr viel schneller macht als die Verwendung einer expliziten Schleife.
@@ -194,7 +194,7 @@ Die trainierten Parameter befinden sich in den Attributen \lstinline{intercept_}
 und \lstinline{coef_}:
 \begin{lstlisting}
 >>> lin_reg.intercept_, lin_reg.coef_
-(array([4.84609918]), array([[3.03831479]]))
+°(array([4.84609918]), array([[3.03831479]]))°
 \end{lstlisting}
 Nicht schlecht: Das Modell vermutet $\yhat = 4.85 + 3.04x_1$, wobei die ursprünglich
 Funktion $y = 5 + 3x_1 + r$ war. Die genauen Werte konnten aufgrund des Rauschens
@@ -207,11 +207,11 @@ in \autoref{plot:linear-data-prediction} zu sehen.
   \label{plot:linear-data-prediction}
 \end{figure}
 
-\paragraph{Batch und Online Lernen}
+\paragraph{Batch- und Online-Learning}
 Ein weiterer Punkt, anhand dessen ein KI-System unterschieden
-werden kann, ist die Methode wie es Daten verarbeitet \parencite[15]{book:hands-on-ml}.
-Dieser Unterschied nennt sich Batch und Online Lernen.
-Beim Batch Lernen werden Daten stapelweise verarbeitet.
+werden kann, ist die Methode, wie es Daten verarbeitet \parencite[15]{book:hands-on-ml}.
+Dieser Unterschied nennt sich Batch- und Online-Learning.
+Beim Batch-Learning werden Daten stapelweise verarbeitet.
 Das Modell bzw. die Parameter werden erst dann angepasst,
 nachdem der gesamte Stapel (Batch) das Training durchlaufen hat.
 Dies braucht in der Regel viel Zeit und Speicherkapazität, weshalb
@@ -219,18 +219,68 @@ es typischerweise offline durchgeführt wird.
 Nachdem ein System veröffentlicht wurde, wendet es, dass an, was es gelernt hat,
 kann aber keine neuen Schlüsse mehr ziehen.
 Soll das System auf neue Daten reagieren, muss ein neues Modell trainiert werden.
-Das Online Lernen funktioniert anders.
+Das Online-Learning funktioniert anders.
 Im Training werden die Daten nicht stapelweise verarbeitet,
 sondern einzeln nacheinander.
 Dies spart Zeit und Platz und kann hilfreich sein, wenn es darum geht,
 mit sehr großen Datensätzen zu trainieren, die nicht alle gleichzeitig
 in den Speicher passen würden.
 Ein weiterer Vorteil ist der, dass neue Daten spontan auf dem Weg
-verarbeitet werden können. Online Lernen eignet sich also gut,
+verarbeitet werden können. Online-Learning eignet sich also gut,
 um kontinuierliche Daten zu analysieren (z.\,B. Aktienkurse).
 
 \section{Beschreibung des Problems}
 In dieser Bachelorarbeit geht es um Maschinelles Lernen auf mobilen Geräten.
 Zu Beginn der Arbeit stellte sich der Autor die Frage:
-Wie kann ein System entwickelt werden mit dem verschiedene KI-Modelle
-verwaltet, welches modular und einfach erweiterbar ist.
+\enquote{Wie kann ein System entwickelt werden, mit dem verschiedene KI-Modelle
+  verwaltet werden können, welches modular und einfach erweiterbar ist
+  und über gemeinsame Schnittstellen im Netz kommuniziert?}
+Das System soll gut zusammen mit der Idee des Internets der Dinge
+(engl. Internet of Things, IoT) integriert werden können.
+Die Modularität ist deshalb wichtig, da auch IoT aus vielen vernetzten
+Einzelelementen besteht.
+Der restliche Teil dieser Arbeit wird sich mit einer
+speziellen Form von KI-Systemen beschäftigen: diese sind künstliche
+neuronale Netze. Die Natur hat bereits eine unzählige Menge von Erfindungen
+inspiriert, es liegt daher nahe, die Funktionsweise des Gehirns zu
+untersuchen, um ein intelligentes System zu entwickeln.
+Der Trainingsprozess eines neuronalen Netzes nennt sich Deep Learning (DL).
+Die technische Idee von DL ist bereits mehrere
+Jahrzehnte bekannt:
+Der Neurophysiologie Warren McCulloch und der Mathematiker Walter Pitts
+haben das Prinzip im Jahr 1943 erstmalig öffentlich eingeführt
+\parencite[280]{book:hands-on-ml}. Der frühe Erfolg von neuralen
+Netzen brachte Enthusiasmus und große Erwartungen,
+doch als sich in den 70er-Jahren herausstellte, dass diese Erwartungen nicht erfüllt
+werden können, verlangsamte sich die Forschung und die finanziellen Fördermittel
+wurden weniger \parencite[280]{book:hands-on-ml}.
+Es ist nur kürzlich, dass neuronale Netze einen neuen Aufschwung erleben
+und dies nicht nur eine Wiederholung der Vergangenheit ist.
+Die folgenden Punkte begründen diese Vermutung \parencite[280]{book:hands-on-ml}:
+\begin{itemize}
+  \item Durch die immer stärker digitalisierte Welt
+        entstehen sehr große Mengen an Daten.
+        Die Forschung und Praxis hat gezeigt, dass tiefe neuronale Netze umso besser funktionieren,
+        je mehr Trainingsdaten zur Verfügung stehen. Diese steht im Gegensatz
+        zu anderen Lernverfahren, wessen Performanz ab einer bestimmten
+        Datenmenge typischerweise begrenzt ist.
+  \item Rechenstarke CPUs und GPUs machen es möglich, auch große neuronale Netze
+        schnell zu trainieren. Der Trainingsprozess eines neuronalen
+        Netzes ist ein sehr iterativer Prozess.
+        \begin{figure}[!h]
+          \centering
+          \input{chapters/einleitung/tikz/train-circle.tex}
+          \caption{Der Trainingsprozess eines neuronalen Netzes}
+          \label{fig:nn-training-process}
+        \end{figure}
+        Es beginnt häufig mit einer Idee,
+        gefolgt von der Umsetzung und anschließenden Experimenten, um die ursprüngliche
+        Idee zu bessern.
+        Dieser Ablauf ist in \autoref{fig:nn-training-process} zu sehen.
+        Geht das Training schnell, kann dieser Kreislauf öfter durchlaufen
+        werden und es wird ein besseres Ergebnis erzielt.
+  \item Es gibt bereits viele hervorragende Anwendungen, die zeigen,
+        wie gut neuronale Netze funktionieren, um komplexe Probleme zu lösen.
+\end{itemize}
+Maschinelles Lernen auf mobilen Geräten bringt einige
+zusätzlichen Herausforderungen mit sich.

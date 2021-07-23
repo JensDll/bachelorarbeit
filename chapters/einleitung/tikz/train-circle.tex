@@ -1,0 +1,12 @@
+\begin{tikzpicture}[
+    node distance=0.5,
+    arr/.style={-Triangle, shorten <= 2mm, shorten >=2mm, thick}
+  ]
+
+  \node (idee) {Idee};
+  \node [below right= of idee] (umsetzung) {Umsetzung};
+  \node [below left= of idee] (experiment) {Experimentieren}
+  (experiment) edge [arr, bend left=20] (idee)
+  (idee) edge[arr, bend left=20] (umsetzung)
+  (umsetzung) edge[arr, bend left=30] (experiment);
+\end{tikzpicture}
