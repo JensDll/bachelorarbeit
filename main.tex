@@ -13,6 +13,7 @@
 \usepackage{xparse}
 \usepackage[dvipsnames]{xcolor}
 \usepackage[tikz]{mdframed}
+\usepackage{siunitx}
 
 \usepackage[unicode]{hyperref}
 \hypersetup{
@@ -25,9 +26,6 @@
 
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.5}
-
-\usepackage{siunitx}
-
 
 \usepackage{amsmath}
 
@@ -47,17 +45,22 @@
   {\begin{quote}}
   {\\\hspace*{16pt}--- #1\end{quote}}
 
+
+
+
+
 \begin{document}
 \pagenumbering{Roman}
 \include{general/titlepage}
 \onehalfspacing
 \include{general/erklärung.tex}
-% \include{general/abstract.tex}
+\include{general/abstract.tex}
 \tableofcontents
 \listoffigures
 % \lstlistoflistings
 \newpage
 \pagenumbering{arabic}
 \include{chapters/einleitung/index.tex}
+\include{chapters/first-nn/index.tex}
 \printbibliography
 \end{document}

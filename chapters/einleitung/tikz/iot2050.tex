@@ -1,0 +1,25 @@
+\begin{figure}[h!]
+  \centering
+  \begin{tikzpicture}
+    [every node/.style={inner sep=0}]
+
+    \node [] (a) {
+      \begin{minipage}{0.45\textwidth}
+        \includegraphics[width=1\textwidth]{einleitung/iot2050-haus.png}
+        \caption*{(a)}
+      \end{minipage}
+    };
+    \node [right= of a] (b) {
+      \begin{minipage}{0.45\textwidth}
+        \includegraphics[width=1\textwidth]{einleitung/iot2050.png}
+        \caption*{(b)}
+      \end{minipage}
+    };
+
+    \node[draw=Red, rectangle, thick, yshift=29.5mm, xshift=3.5mm,
+      minimum width=2.5cm, minimum height=2.5cm] at (b.south) {};
+  \end{tikzpicture}
+  \caption{Siemens SIMATIC IOT2050 mit (a) und ohne (b) Gehäuse und
+    Google Coral Edge TPU ML accelerator (b) als Half-Mini PCIe Karte in Rot markiert}
+  \label{fig:iot2050}
+\end{figure}
