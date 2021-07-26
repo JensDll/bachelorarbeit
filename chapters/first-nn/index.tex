@@ -6,3 +6,103 @@ Deep Learning sich in der heutigen Zeit mehr und mehr durchsetzt.
 Es konnte außerdem das Ziel dieser Arbeit
 beschrieben und einen ersten Einblick
 in die verwendete Hardware gegeben werden.
+In diesem Kapitel soll es darum gehen, die
+TensorFlow Bibliothek kennenzulernen
+und zu zeigen wie ein Deep-Learning-Modell
+für mobile Geräte (und der Google Coral Edge TPU) bereitgestellt wird.
+Das Kapitel ist gegliedert nach den folgenden Schritten:
+\begin{enumerate}
+  \item Hole den Trainingsdatensatz.
+  \item Trainiere ein neuronales Netz mit TensorFlow.
+  \item Bewerte die Ergebnisse des Modells.
+  \item Konvertiere das Modell in ein mobil- und TPU-kompatibles Format.
+  \item Schreibe Code, um auf dem Gerät Prognosen durchzuführen.
+\end{enumerate}
+Die Idee dieses Kapitels stammt aus Kapitel 4 des Buchs \citetitle{book:tiny-ml}
+von \textcite{book:tiny-ml} (welche involviert in der Entwicklung
+der TensorFlow Lite Bibliothek sind) mit einigen
+anwendungs- und hardwarespezifischen Änderungen.
+
+\section{Das Ziel des Modells}
+Ähnlich wie \autoref{sec:lernmethoden} handelt es sich
+um ein einfaches Modell mit nur einer Ein- und Ausgabe.
+Die zu modellierenden Daten sind etwas komplexer,
+es geht um eine bekannte trigonometrische Funktion: der Sinuskurve.
+Das Ziel des Modells ist es also, durch eine Eingabe $x$
+den $y$-Wert $\sin(x)$ zu bestimmen.
+In einer echten Anwendung könnte
+diese Zahl natürlich direkt ermittelt werden,
+das Beispiel soll jedoch zeigen,
+wie mit Deep Learning (und sehr kleinen Netzen)
+bereits anspruchsvollere, nicht lineare Daten gut modelliert werden können.
+Die Sinusfunktion ist in \autoref{plot:sine-curve} zu sehen.
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{first-nn/sine-curve.pdf}
+  \caption{Die Sinusfunktion}
+  \label{plot:sine-curve}
+\end{figure}
+
+\section{Generieren der Daten}
+Neuronale Netze können komplexe Muster in den zugrundeliegenden Daten erkennen
+und dabei sehr vielseitig eingesetzt werden.
+In diesem Beispiel geht es wie zuvor um ein einfaches Regressionsproblem,
+ein neuronales Netz kann genauso gut, aber auch für
+Klassifizierung, Bildanalyse, Videoanalyse, unüberwachtes Lernen und vieles mehr verwendet werden.
+Die Trainingsdaten können mit TensorFlow generiert werden und
+die Vorgehensweise ist hierbei sehr ähnlich wie mit der Verwendung von NumPy:
+\begin{pythoncode}
+import tensorflow as tf
+import math
+
+SAMPLES = 2000
+
+tf.random.set_seed(42)
+
+x = tf.random.uniform((SAMPLES, 1), minval=0, maxval=2*math.pi)
+tf.random.shuffle(x)
+
+y = tf.math.sin(x)
+\end{pythoncode}
+Der vorhergehende Code generiert zwei Spaltenvektoren
+(Trainingsdaten \pythoninline{x} und Label \pythoninline{y})
+mit jeweils 2000 Werten im Bereich 0 bis $2\pi$.
+Dieser Bereich nennt sich die Periode der Sinusfunktion,
+da sich die Funktionswerte von dort an immer wiederholen:
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{first-nn/sine-data.pdf}
+  \caption{Die generierten Daten}
+\end{figure}
+
+\noindent
+Damit das Problem realistischer ist, wird auch für diese Daten
+zufälliges Rauschen hinzugefügt:
+\begin{pythoncode}
+y += 0.25 * tf.random.normal(y.shape)
+\end{pythoncode}
+Die neuen Daten sehen wie folgt aus:
+\newpage
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{first-nn/sine-data-noise.pdf}
+  \caption{Die generierten Daten plus zufälliges Rauschen}
+\end{figure}
+
+\section{Aufteilen der Trainingsdaten}
+Um die Qualität eines Modells bewerten zu können, werden
+mehr Daten benötigt als lediglich die Trainingsbeispiele.
+Dies ist der Grund warum es für gewöhnlich mehr als nur einen
+Datensatz gibt. Ein typisches Beispiel ist die Aufgliederung
+in drei Teil: dem \textit{training}, \textit{validation} und \textit{test set}.
+Die Schritte, um ein passendes Modell für ein Problem zu finden, sind die Folgenden:
+\begin{enumerate}
+  \item Probiere verschiedene Ideen aus und trainiere einige Modelle mithilfe des
+        \textit{training set}.
+  \item Bewerte die Qualität der Modelle anhand des \textit{validation set} und wähle
+        einen oder mehrere der vielversprechendsten Kandidaten aus.
+  \item Verbessere die Leistung der ausgewählten Modelle am \textit{validation set}
+        solange, bis ein Modell mit der gewünschten Qualität gefunden wurde.
+        Das ausgewählte Modell kann schließlich durch das
+        \textit{test set} evaluiert werden, um den Generalisierungsfehler abzuschätzen.
+\end{enumerate}

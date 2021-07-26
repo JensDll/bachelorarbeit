@@ -12,25 +12,23 @@
 \usepackage{caption}
 \usepackage{xparse}
 \usepackage[dvipsnames]{xcolor}
-\usepackage[tikz]{mdframed}
 \usepackage{siunitx}
+
+\input{preamble/minted.tex}
+\input{preamble/commands.tex}
 
 \usepackage[unicode]{hyperref}
 \hypersetup{
-  % colorlinks = true,
   linkcolor = Red,
   filecolor = Magenta,
   urlcolor = Green,
   citecolor = Cyan
 }
 
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.5}
-
 \usepackage{amsmath}
 
 \usepackage[style = authoryear-ibid]{biblatex}
-\addbibresource{general/main.bib}
+\addbibresource{preamble/main.bib}
 
 \usepackage{graphicx}
 \graphicspath{{./images}}
@@ -38,29 +36,25 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning, calc, arrows.meta, arrows}
 
-\input{general/listing.tex}
-\input{general/commands.tex}
+\usepackage[tikz]{mdframed}
 
 \NewDocumentEnvironment{aquote}{m}
   {\begin{quote}}
   {\\\hspace*{16pt}--- #1\end{quote}}
 
-
-
-
-
 \begin{document}
 \pagenumbering{Roman}
-\include{general/titlepage}
+\include{pages/titlepage.tex}
 \onehalfspacing
-\include{general/erklärung.tex}
-\include{general/abstract.tex}
+\include{pages/erklärung.tex}
+\include{pages/abstract.tex}
 \tableofcontents
 \listoffigures
-% \lstlistoflistings
 \newpage
 \pagenumbering{arabic}
 \include{chapters/einleitung/index.tex}
 \include{chapters/first-nn/index.tex}
-\printbibliography
+\pagenumbering{Alph}
+\printbibliography[title = Literaturverzeichnis]
+\addcontentsline{toc}{chapter}{Literaturverzeichnis}
 \end{document}

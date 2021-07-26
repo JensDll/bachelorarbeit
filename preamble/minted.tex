@@ -1,0 +1,15 @@
+\usepackage[cache=false]{minted}
+\renewcommand{\listingscaption}{Quelltext}
+\renewcommand{\listoflistingscaption}{Quelltextverzeichnis}
+
+\setminted{
+  autogobble,
+  style=mypy,
+  xleftmargin=2em,
+  fontsize=\scriptsize,
+  formatcom=\onehalfspacing\fontencoding{T1}\fontfamily{fvm}\selectfont,
+  escapeinside=||
+}
+
+\newmintinline{python}{}
+\newminted{python}{}
