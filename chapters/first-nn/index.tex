@@ -93,8 +93,8 @@ Die neuen Daten sehen wie folgt aus:
 Um die Qualität eines Modells bewerten zu können, werden
 mehr Daten benötigt als lediglich die Trainingsbeispiele.
 Dies ist der Grund warum es für gewöhnlich mehr als nur einen
-Datensatz gibt. Ein typisches Beispiel ist die Aufgliederung
-in drei Teil: dem \textit{training}, \textit{validation} und \textit{test set}.
+Datensatz gibt. Eine typische Vorgehensweise ist die Aufgliederung
+in drei Teile: dem \textit{training}, \textit{validation} und \textit{test set}.
 Die Schritte, um ein passendes Modell für ein Problem zu finden, sind die Folgenden:
 \begin{enumerate}
   \item Probiere verschiedene Ideen aus und trainiere einige Modelle mithilfe des
@@ -106,3 +106,70 @@ Die Schritte, um ein passendes Modell für ein Problem zu finden, sind die Folge
         Das ausgewählte Modell kann schließlich durch das
         \textit{test set} evaluiert werden, um den Generalisierungsfehler abzuschätzen.
 \end{enumerate}
+Im Training sollte der Algorithmus lediglich die Trainingsdaten
+zu Gesicht bekommen. Dies hilft bekannten
+Fehlerquellen wie der Überanpassung (dem Gegenstück zur Unteranpassung, engl.
+\textit{overfitting} und \textit{underfitting}) vorzubeugen.
+Die folgende Abbildung soll die beiden Begriffe verdeutlichen.
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{first-nn/over_underfitting.pdf}
+  \caption{Überanpassung und Unteranpassung am Beispiel einer
+  quadratischen Funktion \parencite[131]{book:hands-on-ml}}
+\end{figure}
+
+\noindent
+Modelliert ein Algorithmus die Struktur der Trainingsdaten zu gut, dann
+ist die Rede von Überanpassung. Dies ist zu sehen
+durch die grüne Linie. Die Funktion mag die Trainingsdaten
+am besten beschreiben, schafft es aber nicht auf neue
+Daten zu verallgemeinern.
+Überanpassung kann erkannt werden, wenn die Leistung des Modells am
+\textit{training set} steigt, während sie am \textit{validation set}
+sinkt. Das Gegenstück der Überanpassung ist die
+Unteranpassung. Dies zu sehen durch die blau gestreifte Linie.
+Das Modell (mit nur linearen Features)
+schafft es nicht die Trainingsdaten gut genug zu beschreiben.
+Die besten Ergebnisse werden in diesem Beispiel durch die rote Linie erzeugt.
+Um die zuvor generierten Trainingsdaten aufzuteilen,
+kann die TensorFlow Methode \pythoninline{tf.split}
+verwendet werden:
+\begin{pythoncode}
+# Wir verwenden 50% der Daten für training und 20% für testing.
+# Die restlichen 30% werden für validation verwendet.
+TRAIN_SPLIT = int(0.5 * SAMPLES)
+TEST_SPLIT = int(0.2 * SAMPLES)
+VAL_SPLIT = SAMPLES - TRAIN_SPLIT - TEST_SPLIT
+
+# Gliedere den Datensatz in drei Teile auf
+x_train, x_test, x_val = tf.split(x, [TRAIN_SPLIT, TEST_SPLIT, VAL_SPLIT])
+y_train, y_test, y_val = tf.split(y, [TRAIN_SPLIT, TEST_SPLIT, VAL_SPLIT])
+
+# Verifiziere die Aufteilung, durch summieren der Größen
+assert tf.size(x_train) + tf.size(x_test) + tf.size(x_val) == SAMPLES
+\end{pythoncode}
+Die drei Datensätze können nun in der folgenden Abbildung farblich dargestellt werden.
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{first-nn/sine-data-noise-legend.pdf}
+  \caption{Aufteilung der Sinusdaten in
+  \textit{training}, \textit{validation} und \textit{test set}}
+\end{figure}
+
+\section{Definieren eines grundlegenden Modells}
+Ein neuronales Netz besteht aus mehreren kleinen Einheiten (auch Neuronen genannt).
+Jedes Neuron nimmt entgegen ein bis $n$ numerische Eingaben, führt einige
+einfache Berechnungen durch und produziert eine numerische Ausgabe.
+Alleine kann ein Neuron kaum die einfachsten Probleme lösen, doch zusammen
+durch Komposition und Training haben sie das Potenzial,
+die komplexe Welt verstehen.
+Der Aufbau eines einzelnen Neuron ist in \autoref{fig:nn-neuron} zu sehen.
+\newpage
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.3\textwidth]{first-nn/nn-neuron.pdf}
+  \caption{Der Aufbau eines einzelnen Neuron}
+  \label{fig:nn-neuron}
+\end{figure}
+\noindent
+Als erster Schritt wird eine gewichtete Summe der Eingabewerte berechnet.
