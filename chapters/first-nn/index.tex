@@ -93,7 +93,7 @@ Die neuen Daten sehen wie folgt aus:
 Um die Qualität eines Modells bewerten zu können, werden
 mehr Daten benötigt als lediglich die Trainingsbeispiele.
 Dies ist der Grund warum es für gewöhnlich mehr als nur einen
-Datensatz gibt. Eine typische Vorgehensweise ist die Aufgliederung
+Datensatz gibt. Eine typische Vorgehensweise ist die Aufgliederung der Daten
 in drei Teile: dem \textit{training}, \textit{validation} und \textit{test set}.
 Die Schritte, um ein passendes Modell für ein Problem zu finden, sind die Folgenden:
 \begin{enumerate}
@@ -110,7 +110,7 @@ Im Training sollte der Algorithmus lediglich die Trainingsdaten
 zu Gesicht bekommen. Dies hilft bekannten
 Fehlerquellen wie der Überanpassung (dem Gegenstück zur Unteranpassung, engl.
 \textit{overfitting} und \textit{underfitting}) vorzubeugen.
-Die folgende Abbildung soll die beiden Begriffe verdeutlichen.
+Die folgende Abbildung soll die beiden Begriffe deutlich machen.
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.7\textwidth]{first-nn/over_underfitting.pdf}
@@ -178,9 +178,9 @@ der Eingabewerte berechnet. Die Elemente $\mathbf{x}$ und $\mathbf{w}$
 sind Spaltenvektoren der Form: $(x_1,\dotsc,x_n)^T$ und $(w_1,\dotsc,w_n)^T$.
 \footnote{Wie immer wird versucht Berechnungen als Vektor- und Matrixoperationen
 auszudrücken um CPU und GPU Beschleunigung auszunutzen.}
-Der zweite Schritt wendet eine Aktivierungsfunktion an und dies
+Der zweite Schritt wendet eine Aktivierungsfunktion auf diese Summe an und dies
 erzeugt die Ausgabe: $y = a(z)$. Ein neuronales Netz
-besteht aus der Verknüpfung verschiedener Neuronen und die
+besteht aus der Komposition verschiedener Neuronen und die
 Gewichte stellen die erlernbaren Parameter dar.
 \autoref{fig:example-nn} zeigt ein einfaches neuronales Netz
 mit zwei verdeckten Schichten (engl. \textit{hidden layers}).
@@ -191,7 +191,7 @@ mit zwei verdeckten Schichten (engl. \textit{hidden layers}).
   \label{fig:example-nn}
 \end{figure}
 \noindent
-Verdeckte Schichten sind all diejenigen, die nicht Ein- oder Ausgabe sind.
+Verdeckte Schichten sind all diejenigen Schichten, die nicht Ein- oder Ausgabe sind.
 Jede Schicht außer der Ausgabeschicht enthält ein Bias-Neuron
 (in Gelb markiert), welches immer Eins ausgibt, aber auch trainiert werden kann
 und ist vollständig mit der nächsten Schicht verbunden.
