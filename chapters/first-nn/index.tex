@@ -179,11 +179,10 @@ sind Spaltenvektoren der Form: $(x_1,\dotsc,x_n)^T$ und $(w_1,\dotsc,w_n)^T$.
 \footnote{Wie immer wird versucht Berechnungen als Vektor- und Matrixoperationen
 auszudrücken um CPU und GPU Beschleunigung auszunutzen.}
 Der zweite Schritt wendet eine Aktivierungsfunktion auf diese Summe an und dies
-erzeugt die Ausgabe: $y = a(z)$. Ein neuronales Netz
+erzeugt die Ausgabe: $y = a(z)$. Die Ausgabe eines Neuron
+wird typischerweise die Aktivierung genannt. Ein neuronales Netz
 besteht aus der Komposition verschiedener Neuronen und die
 Gewichte stellen die erlernbaren Parameter dar.
-\autoref{fig:example-nn} zeigt ein einfaches neuronales Netz
-mit zwei verdeckten Schichten (engl. \textit{hidden layers}).
 \begin{figure}[h!]
   \centering
   \includegraphics{first-nn/example-nn.pdf}
@@ -191,6 +190,8 @@ mit zwei verdeckten Schichten (engl. \textit{hidden layers}).
   \label{fig:example-nn}
 \end{figure}
 \noindent
+\autoref{fig:example-nn} zeigt ein einfaches neuronales Netz
+mit zwei verdeckten Schichten (engl. \textit{hidden layers}).
 Verdeckte Schichten sind all diejenigen Schichten, die nicht Ein- oder Ausgabe sind.
 Jede Schicht außer der Ausgabeschicht enthält ein Bias-Neuron
 (in Gelb markiert), welches immer Eins ausgibt, aber auch trainiert werden kann
@@ -200,5 +201,37 @@ Ein neuronales Netz wird tief genannt, wenn es viele verdeckte Schichten besitzt
 mit mehr als zwei verdeckten Schichten als tief angesehen.
 Da es aber heutzutage Netze mit Dutzend und Hunderten von Schichten
 gibt, ist die Definition von \enquote{tief} etwas schwammig \parencite[289]{book:hands-on-ml}.}
-Ein neuronales Netz wird durch einen Algorithmus trainiert, der
+Es wird durch einen Algorithmus trainiert, der
 sich Backpropagation nennt.
+Backpropagation ist der mit Abstand mathematischste Teil von
+Deep Learning, da der Schwerpunkt dieser Arbeit auf der Entwicklung einer
+Anwendung liegt, werden wir nicht im Detail untersuchen,
+wie diese und verwandte Algorithmen wie das Gradientenabstiegsverfahren
+funktionieren. Zusätzlich können Deep-Learning-Bibliotheken
+wie TensorFlow diese Aufgabe automatisch übernehmen.\\[8pt]
+Kurzum \parencite[290-291]{book:hands-on-ml}:
+Backpropagation besteht aus zwei Phasen: einem Vorwärtsdurchlauf
+und einem Rückwärtsdurchlauf. Die Daten werden stapelweise verarbeitet
+(\zB 32 Datensätze auf ein­mal) und der gesamte Trainingsdatensatz
+wird mehrfach durchlaufen. Ein Trainingsdurchlauf nennt sich Epoche.\\[4pt]
+Jeder Datenstapel wird an die erste Schicht des neuronalen Netzes
+übergeben. Von dort wird im Vorwärtsdurchlauf die Aktivierung aller
+Neuronen bis hin zur Ausgabeschicht ermittelt und die Zwischenerbnisse gespeichert.\\[4pt]
+Nachdem die Ausgaben der letzten Schicht bekannt sind, kann
+durch Vergleich der Sollwerte der Fehler des Netzes ermittelt werden.
+Dies geschieht durch eine Kostenfunktion $J$. Im Fall eines Regressionsproblems
+wird typischerweise die mittlere quadratische Abweichung verwendet
+(engl. \textit{mean squared error}) \parencite[113-114]{book:hands-on-ml}:
+\begin{equation}
+  J(\mathbf{\hat{y}}, \mathbf{y}) =
+  MSE(\mathbf{\hat{y}}, \mathbf{y}) =
+    \frac{1}{m} \sum_{i=1}^{m} (\mathbf{\hat{y}}^{(i)} - \mathbf{y}^{(i)})^2
+\end{equation}
+Die Werte $\mathbf{\hat{y}}$ und $\mathbf{y}$ sind Spaltenvektoren
+mit den Ausgaben des Netzes und den tatsächlichen Werten, die Zahl $m$
+ist Größe des Vektors, welche in diesem Fall gleich der Stapelgröße
+(engl. \textit{batch size}) ist.\\[4pt]
+Der Rückwärtsdurchlauf im letzten Schritt ist der eigentliche Teil, mit dem das Netz
+trainiert wird. Der Algorithmus misst, wie stark jedes Gewicht den Fehler der
+vorherigen Schicht beeinflusst hat und versucht, diese so anzupassen,
+damit der Fehler minimiert wird.
