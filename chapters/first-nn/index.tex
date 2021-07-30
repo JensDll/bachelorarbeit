@@ -151,12 +151,12 @@ assert tf.size(x_train) + tf.size(x_test) + tf.size(x_val) == SAMPLES
 Die drei Datensätze können nun in der folgenden Abbildung farblich dargestellt werden.
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.7\textwidth]{first-nn/sine-data-noise-legend.pdf}
+  \includegraphics[width=0.7\textwidth]{first-nn/sine-data-noise-split.pdf}
   \caption{Aufteilung der Sinusdaten in
   \textit{training}, \textit{validation} und \textit{test set}}
 \end{figure}
 
-\section{Definieren eines grundlegenden Modells}
+\section{Entwurf des ersten Modells}
 Ein neuronales Netz besteht aus mehreren kleinen Einheiten (auch Neuronen genannt).
 Jedes Neuron nimmt entgegen ein bis $n$ numerische Eingaben, führt einige
 einfache Berechnungen durch und produziert eine numerische Ausgabe.
@@ -191,7 +191,8 @@ Gewichte stellen die erlernbaren Parameter dar.
 \end{figure}
 \noindent
 \autoref{fig:example-nn} zeigt ein einfaches neuronales Netz
-mit zwei verdeckten Schichten (engl. \textit{hidden layers}).
+mit zwei verdeckten Schichten (engl. \textit{hidden layers}),
+zwei Eingaben und einer Ausgabe.
 Verdeckte Schichten sind all diejenigen Schichten, die nicht Ein- oder Ausgabe sind.
 Jede Schicht außer der Ausgabeschicht enthält ein Bias-Neuron
 (in Gelb markiert), welches immer Eins ausgibt, aber auch trainiert werden kann
@@ -206,7 +207,7 @@ sich Backpropagation nennt.
 Backpropagation ist der mit Abstand mathematischste Teil von
 Deep Learning, da der Schwerpunkt dieser Arbeit auf der Entwicklung einer
 Anwendung liegt, werden wir nicht im Detail untersuchen,
-wie diese und verwandte Algorithmen wie das Gradientenabstiegsverfahren
+wie dieser und verwandte Algorithmen wie das Gradientenabstiegsverfahren
 funktionieren. Zusätzlich können diese Methoden durch Deep-Learning-Bibliotheken
 wie TensorFlow automatisiert werden.\\[8pt]
 Kurzum \parencite[290-291]{book:hands-on-ml}:
@@ -230,8 +231,56 @@ wird typischerweise die mittlere quadratische Abweichung verwendet
 Die Werte $\mathbf{\hat{y}}$ und $\mathbf{y}$ sind Spaltenvektoren
 mit den Ausgaben des Netzes und den tatsächlichen Werten, die Zahl $m$
 ist Größe des Vektors, welche in diesem Fall gleich der Stapelgröße
-(engl. \textit{batch size}) ist.\\[4pt]
+(engl. \textit{batch size}) ist. Der Index $\mathbf{v}^{(i)}$ ist keine Potenz,
+sondern beschreibt den i-ten Wert im Vektor $\mathbf{v}$.\\[4pt]
 Der Rückwärtsdurchlauf im letzten Schritt ist der eigentliche Teil, mit dem das Netz
 trainiert wird. Der Algorithmus misst, wie stark jedes Gewicht den Fehler der
 vorherigen Schicht beeinflusst hat und versucht, diese so anzupassen,
-damit die Kostenfunktion minimiert wird.
+damit die Kostenfunktion minimiert wird.\\[8pt]
+TensorFlow und insbesondere die TensorFlow Keras API
+macht es einfach, neuronale Netze zu entwerfen und zu trainieren.
+Keras ist eine High-Level DL API, welche
+von François Chollet als Teil eines Forschungsprojekts entwickelt
+wurde und seit März 2015 ein Open-Source-Projekt ist
+\parencite[295]{book:hands-on-ml}. Keras kann
+unabhängig von TensorFlow verwendet werden, es benötigt
+jedoch einen Rechenkern, der die
+für DL erforderlichen umfangreichen Berechnungen durchführen kann.
+In dieser Arbeit wird daher ausschließlich die \pythoninline{tf.keras} API
+verwendet. Mit Keras ein Modell zu entwerfen ist unkompliziert:
+\begin{pythoncode}
+from tensorflow import keras
+
+input_layer = keras.layers.Input(shape=[1])
+hidden1 = keras.layers.Dense(units=16, activation="relu")(input_layer)
+output_layer = keras.layers.Dense(units=1, name="output")(hidden1)
+
+model = keras.Model(inputs=input_layer, outputs=output_layer)
+\end{pythoncode}
+\begin{itemize}
+  \item Die erste Zeile importiert das Keras Modul von TensorFlow.
+  \item Als nächstes wird eine Eingabeschicht definiert.
+        Diese dient ausschließlich dazu, die Dimension der Eingabewerte festzulegen.
+        Da das Modell nur eine Zahl entgegen nimmt, ist die Dimension des Eingabevektors eins.
+  \item Die nächste Zeile definiert die erste und einzige verborgene Schicht mit
+        16 Neuronen. Die Einheiten verwenden die ReLU
+        (\textit{Rectified Linear Unit}) Aktivierungsfunktion, welche wie folgt
+        definiert ist:
+        \begin{equation}
+          a(z) = ReLU(z) = \max(0, z)
+        \end{equation}
+        ReLU ist eine sehr beliebte Aktivierungsfunktion, die sich nicht
+        nur einfach berechnen lässt, sondern auch in der Praxis bewährt hat
+        und daher gut als Standardauswahl eignet. Es gibt viele
+        weitere Aktivierungsfunktion, welche häufig eingesetzt werden.
+        Vier der gewöhnlichsten sind in \autoref{activation-functions}
+        zu sehen.
+        \newpage
+        \begin{figure}[h!]
+          \centering
+          \includegraphics[width=0.7\textwidth]{first-nn/activation-functions.pdf}
+          \caption{Verschiedene Aktivierungsfunktionen \parencite[292]{book:hands-on-ml}}
+          \label{activation-functions}
+        \end{figure}
+  \item Dann
+\end{itemize}

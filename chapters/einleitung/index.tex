@@ -195,7 +195,7 @@ eine weitere Python Bibliothek mit dem Namen Matplotlib:
 import matplotlib.pyplot as plt
 plt.plot(x, y, "b.")
 plt.xlabel("$x_1$")
-plt.ylabel(r"$5 + 3x$")
+plt.ylabel("$5 + 3x$")
 plt.axis([0, 6, 5, 25])
 plt.show()
 \end{pythoncode}
@@ -244,7 +244,7 @@ lin_reg.fit(x, y)
 \end{pythoncode}
 Wir verwenden das \pythoninline{LinearRegression} Modell von Scikit-Learn
 \footnote{\url{https://scikit-learn.org/stable/}} und rufen die \pythoninline{fit}
-Methode zusammen mit den Trainingsdaten und Labels auf, um das Modell zu trainieren.
+Methode zusammen mit den Trainingsdaten und Sollwerten auf, um das Modell zu trainieren.
 Die trainierten Parameter befinden sich in den Attributen \pythoninline{intercept_}
 und \pythoninline{coef_}:
 \begin{pythoncode}
@@ -420,7 +420,7 @@ Ein Ausschnitt aus der Benutzeroberfläche ist in
   \label{fig:ui-classification-example}
 \end{figure}
 \noindent
-Zu sehen ist der Teil Webseite zur Klassifizierung von Bilddateien.
+Zu sehen ist der Teil der Webseite zur Klassifizierung von Bilddateien.
 Das zurzeit geladene Modell ist ein für die Edge TPU kompiliertes
 TFLite-Modell (basierend auf der MobileNetV2 Architektur),
 welches in der Lage ist, 1000 unterschiedliche
