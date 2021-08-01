@@ -4,12 +4,23 @@
 
 \setminted{
   autogobble,
-  style=mypy,
-  xleftmargin=2em,
-  fontsize=\scriptsize,
-  formatcom=\onehalfspacing\fontencoding{T1}\fontfamily{fvm}\selectfont,
-  escapeinside=||
+  style=custompy,
+  xleftmargin=2em
 }
 
-\newmintinline{python}{}
-\newminted{python}{}
+\newmintinline{python}{
+  fontsize=\scriptsize,
+  formatcom=\onehalfspacing\fontencoding{T1}\fontfamily{fvm}\selectfont,
+}
+\newminted{python}{
+  fontsize=\scriptsize,
+  formatcom=\onehalfspacing\fontencoding{T1}\fontfamily{fvm}\selectfont,
+}
+\newmintinline{pycon}{
+  fontsize=\scriptsize,
+  formatcom=\onehalfspacing\fontencoding{T1}\fontfamily{fvm}\selectfont,
+}
+\newminted{pycon}{
+  fontsize=\scriptsize,
+  formatcom=\onehalfspacing\fontencoding{T1}\fontfamily{fvm}\selectfont,
+}

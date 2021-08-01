@@ -1,0 +1,362 @@
+\chapter{Trainieren des ersten Neuronale Netzes}
+In dem vorherigen Kapitel haben wir gesehen,
+was Maschinelles Lernen bedeutet, welche
+Probleme es hilft zu lösen und warum
+Deep Learning sich in der heutigen Zeit mehr und mehr durchsetzt.
+Es konnte außerdem das Ziel dieser Arbeit
+beschrieben und einen ersten Einblick
+in die verwendete Hardware gegeben werden.
+In diesem Kapitel soll es darum gehen, die
+TensorFlow Bibliothek kennenzulernen
+und zu zeigen wie ein Deep-Learning-Modell
+für mobile Geräte (und der Google Coral Edge TPU) bereitgestellt wird.
+Das Kapitel ist gegliedert nach den folgenden Schritten:
+\begin{enumerate}
+  \item Hole den Trainingsdatensatz.
+  \item Trainiere ein neuronales Netz mit TensorFlow.
+  \item Bewerte die Ergebnisse des Modells.
+  \item Konvertiere das Modell in ein mobil- und TPU-kompatibles Format.
+  \item Schreibe Code, um auf dem Gerät Prognosen durchzuführen.
+\end{enumerate}
+Die Idee dieses Kapitels stammt aus Kapitel 4 des Buchs \citetitle{book:tiny-ml}
+von \textcite{book:tiny-ml} (welche involviert in der Entwicklung
+der TensorFlow Lite Bibliothek sind) mit einigen
+anwendungs- und hardwarespezifischen Änderungen.
+
+\section{Das Ziel des Modells}
+Ähnlich wie \autoref{sec:lernmethoden} handelt es sich
+um ein einfaches Modell mit nur einer Ein- und Ausgabe.
+Die zu modellierenden Daten sind etwas komplexer,
+es geht um eine bekannte trigonometrische Funktion: der Sinuskurve.
+Das Ziel des Modells ist es also, durch eine Eingabe $x$
+den $y$-Wert $\sin(x)$ zu bestimmen.
+In einer echten Anwendung könnte
+diese Zahl natürlich direkt ermittelt werden,
+das Beispiel soll jedoch zeigen,
+wie mit Deep Learning (und sehr kleinen Netzen)
+bereits anspruchsvollere, nicht lineare Daten gut modelliert werden können.
+Die Sinusfunktion ist in \autoref{plot:sine-curve} zu sehen.
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{first-nn/sine-curve.pdf}
+  \caption{Die Sinusfunktion}
+  \label{plot:sine-curve}
+\end{figure}
+
+\section{Generieren der Daten}
+Neuronale Netze können komplexe Muster in den zugrundeliegenden Daten erkennen
+und dabei sehr vielseitig eingesetzt werden.
+In diesem Beispiel geht es wie zuvor um ein einfaches Regressionsproblem,
+ein neuronales Netz kann genauso gut, aber auch für
+Klassifizierung, Bildanalyse, Videoanalyse, unüberwachtes Lernen und vieles mehr verwendet werden.
+Die Trainingsdaten können mit TensorFlow generiert werden und
+die Vorgehensweise ist hierbei sehr ähnlich wie mit der Verwendung von NumPy:
+\begin{pythoncode}
+import tensorflow as tf
+import math
+
+SAMPLES = 2000
+
+tf.random.set_seed(42)
+
+x = tf.random.uniform((SAMPLES, 1), minval=0, maxval=2*math.pi)
+tf.random.shuffle(x)
+
+y = tf.math.sin(x)
+\end{pythoncode}
+Der vorhergehende Code generiert zwei Spaltenvektoren
+(Trainingsdaten \pythoninline{x} und Label \pythoninline{y})
+mit jeweils 2000 Werten im Bereich 0 bis $2\pi$.
+Dieser Bereich nennt sich die Periode der Sinusfunktion,
+da sich die Funktionswerte von dort an immer wiederholen:
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{first-nn/sine-data.pdf}
+  \caption{Die generierten Daten}
+\end{figure}
+
+\noindent
+Damit das Problem realistischer ist, wird auch für diese Daten
+zufälliges Rauschen hinzugefügt:
+\begin{pythoncode}
+y += 0.25 * tf.random.normal(y.shape)
+\end{pythoncode}
+Die neuen Daten sehen wie folgt aus:
+\newpage
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{first-nn/sine-data-noise.pdf}
+  \caption{Die generierten Daten plus zufälliges Rauschen}
+\end{figure}
+
+\section{Aufteilen der Trainingsdaten}
+Um die Qualität eines Modells bewerten zu können, werden
+mehr Daten benötigt als lediglich die Trainingsbeispiele.
+Dies ist der Grund warum es für gewöhnlich mehr als nur einen
+Datensatz gibt. Eine typische Vorgehensweise ist die Aufgliederung der Daten
+in drei Teile: dem \textit{training}, \textit{validation} und \textit{test set}.
+Die Schritte, um ein passendes Modell für ein Problem zu finden, sind die Folgenden:
+\begin{enumerate}
+  \item Probiere verschiedene Ideen aus und trainiere einige Modelle mithilfe des
+        \textit{training set}.
+  \item Bewerte die Qualität der Modelle anhand des \textit{validation set} und wähle
+        einen oder mehrere der vielversprechendsten Kandidaten aus.
+  \item Verbessere die Leistung der ausgewählten Modelle am \textit{validation set}
+        solange, bis ein Modell mit der gewünschten Qualität gefunden wurde.
+        Das ausgewählte Modell kann schließlich durch das
+        \textit{test set} evaluiert werden, um den Generalisierungsfehler abzuschätzen.
+\end{enumerate}
+Im Training sollte der Algorithmus lediglich die Trainingsdaten
+zu Gesicht bekommen. Dies hilft bekannten
+Fehlerquellen wie der Überanpassung (dem Gegenstück zur Unteranpassung, engl.
+\textit{overfitting} und \textit{underfitting}) vorzubeugen.
+Die folgende Abbildung soll die beiden Begriffe deutlich machen.
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{first-nn/over_underfitting.pdf}
+  \caption{Überanpassung und Unteranpassung am Beispiel einer
+  quadratischen Funktion \parencite[131]{book:hands-on-ml}}
+\end{figure}
+
+\noindent
+Modelliert ein Algorithmus die Struktur der Trainingsdaten zu gut, dann
+ist die Rede von Überanpassung. Dies ist zu sehen
+durch die grüne Linie. Die Funktion mag die Trainingsdaten
+am besten beschreiben, schafft es aber nicht auf neue
+Daten zu verallgemeinern.
+Überanpassung kann erkannt werden, wenn die Leistung des Modells am
+\textit{training set} steigt, während sie am \textit{validation set}
+sinkt. Das Gegenstück der Überanpassung ist die
+Unteranpassung. Dies zu sehen durch die blau gestreifte Linie.
+Das Modell (mit nur linearen Features)
+schafft es nicht die Trainingsdaten gut genug zu beschreiben.
+Die besten Ergebnisse werden in diesem Beispiel durch die rote Linie erzeugt.
+Um die zuvor generierten Trainingsdaten aufzuteilen,
+kann die TensorFlow Methode \pythoninline{tf.split}
+verwendet werden:
+\begin{pythoncode}
+# Wir verwenden 50% der Daten für training und 20% für testing.
+# Die restlichen 30% werden für validation verwendet.
+TRAIN_SIZE = int(0.5 * SAMPLES)
+TEST_SIZE = int(0.2 * SAMPLES)
+VAL_SIZE = SAMPLES - TRAIN_SIZE - TEST_SIZE
+
+# Gliedere den Datensatz in drei Teile auf
+x_train, x_test, x_val = tf.split(x, [TRAIN_SIZE, TEST_SIZE, VAL_SIZE])
+y_train, y_test, y_val = tf.split(y, [TRAIN_SIZE, TEST_SIZE, VAL_SIZE])
+
+# Verifiziere die Aufteilung, durch summieren der Größen
+assert tf.size(x_train) + tf.size(x_test) + tf.size(x_val) == SAMPLES
+\end{pythoncode}
+Die drei Datensätze können nun in der folgenden Abbildung farblich dargestellt werden.
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{first-nn/sine-data-noise-split.pdf}
+  \caption{Aufteilung der Sinusdaten in
+  \textit{training}, \textit{validation} und \textit{test set}}
+\end{figure}
+
+\section{Entwurf des ersten Modells}
+Ein neuronales Netz besteht aus mehreren kleinen Einheiten (auch Neuronen genannt).
+Jedes Neuron nimmt entgegen ein bis $n$ numerische Eingaben, führt einige
+einfache Berechnungen durch und produziert eine numerische Ausgabe.
+Alleine kann ein Neuron kaum die einfachsten Probleme lösen, doch zusammen
+durch Komposition und Training haben sie das Potenzial,
+die komplexe Welt verstehen.
+Der Aufbau eines einzelnen Neuron ist in \autoref{fig:nn-neuron} zu sehen.
+\newpage
+\begin{figure}[h!]
+  \centering
+  \includegraphics{first-nn/nn-neuron.pdf}
+  \caption{Der Aufbau eines einzelnen Neuron}
+  \label{fig:nn-neuron}
+\end{figure}
+\noindent
+Als erster Schritt wird eine gewichtete Summe
+($z = w_1x_1 + w_2x_2 +\dotsb+ w_nx_n = \mathbf{x}^T\mathbf{w}$)
+der Eingabewerte berechnet. Die Elemente $\mathbf{x}$ und $\mathbf{w}$
+sind Spaltenvektoren der Form: $(x_1,\dotsc,x_n)^T$ und $(w_1,\dotsc,w_n)^T$.
+\footnote{Wie immer wird versucht Berechnungen als Vektor- und Matrixoperationen
+auszudrücken um CPU und GPU Beschleunigung auszunutzen.}
+Der zweite Schritt wendet eine Aktivierungsfunktion auf diese Summe an und dies
+erzeugt die Ausgabe: $a = g(z)$. Die Ausgabe eines Neuron
+wird typischerweise die Aktivierung genannt. Ein neuronales Netz
+besteht aus der Komposition verschiedener Neuronen und die
+Gewichte stellen die erlernbaren Parameter dar.
+\begin{figure}[h!]
+  \centering
+  \includegraphics{first-nn/example-nn.pdf}
+  \caption{Ein einfaches neuronales Netz mit zwei verdeckten Schichten}
+  \label{fig:example-nn}
+\end{figure}
+\noindent
+\autoref{fig:example-nn} zeigt ein einfaches neuronales Netz
+mit zwei verdeckten Schichten (engl. \textit{hidden layers}),
+zwei Eingaben und einer Ausgabe.
+Verdeckte Schichten sind all diejenigen Schichten, die nicht Ein- oder Ausgabe sind.
+Jede Schicht außer der Ausgabeschicht enthält ein Bias-Neuron
+(in Gelb markiert), welches immer Eins ausgibt, aber auch trainiert werden kann
+und ist vollständig mit der nächsten Schicht verbunden.
+Ein neuronales Netz wird tief genannt, wenn es viele verdeckte Schichten besitzt.
+\footnote{In den 1990er-Jahren wurde ein neuronales Netz
+mit mehr als zwei verdeckten Schichten als tief angesehen.
+Da es aber heutzutage Netze mit Dutzend und Hunderten von Schichten
+gibt, ist die Definition von \enquote{tief} etwas schwammig \parencite[289]{book:hands-on-ml}.}
+Es wird durch einen Algorithmus trainiert, der
+sich Backpropagation nennt.
+Backpropagation ist der weitaus mathematischste Teil von
+Deep Learning, da der Schwerpunkt dieser Arbeit auf der Entwicklung einer
+Anwendung liegt, werden wir nicht im Detail untersuchen,
+wie dieser und verwandte Algorithmen wie das Gradientenabstiegsverfahren
+funktionieren. Zusätzlich können diese Methoden durch Deep-Learning-Bibliotheken
+wie TensorFlow automatisiert werden.\\[8pt]
+Kurzum \parencite[290-291]{book:hands-on-ml}:
+Backpropagation besteht aus zwei Phasen: einem Vorwärtsdurchlauf
+und einem Rückwärtsdurchlauf. Die Daten werden stapelweise verarbeitet
+(\zB 32 Datensätze auf ein­mal) und der gesamte Trainingsdatensatz
+wird mehrfach durchlaufen. Ein Trainingsdurchlauf nennt sich Epoche.\\[4pt]
+Jeder Datenstapel wird an die erste Schicht des neuronalen Netzes
+übergeben. Von dort wird im Vorwärtsdurchlauf die Aktivierung aller
+Neuronen bis hin zur Ausgabeschicht ermittelt und die Zwischenerbnisse gespeichert.\\[4pt]
+Nachdem die Ausgaben der letzten Schicht bekannt sind, kann
+durch Vergleich der Sollwerte der Fehler des Netzes ermittelt werden.
+Dies geschieht durch eine Kostenfunktion $J$. Im Fall eines Regressionsproblems
+wird typischerweise die mittlere quadratische Abweichung verwendet
+(engl. \textit{mean squared error}) \parencite[113-114]{book:hands-on-ml}:
+\begin{equation}
+  J(\mathbf{\hat{y}}, \mathbf{y}) =
+  MSE(\mathbf{\hat{y}}, \mathbf{y}) =
+    \frac{1}{m} \sum_{i=1}^{m} (\mathbf{\hat{y}}^{(i)} - \mathbf{y}^{(i)})^2
+\end{equation}
+Die Elemente $\mathbf{\hat{y}}$ und $\mathbf{y}$ sind Spaltenvektoren
+mit den Ausgaben des Netzes und den tatsächlichen Werten, die Zahl $m$
+ist Größe des Vektors, welche in diesem Fall gleich der Stapelgröße
+(engl. \textit{batch size}) ist. Der Index $\mathbf{v}^{(i)}$ ist keine Potenz,
+sondern beschreibt den i-ten Wert im Vektor $\mathbf{v}$.\\[4pt]
+Der Rückwärtsdurchlauf im letzten Schritt ist der eigentliche Teil, mit dem das Netz
+trainiert wird. Der Algorithmus misst, wie stark jedes Gewicht den Fehler der
+vorherigen Schicht beeinflusst hat und versucht, diese so anzupassen,
+damit die Kostenfunktion minimiert wird.\\[8pt]
+TensorFlow und insbesondere die TensorFlow Keras API
+macht es einfach, neuronale Netze zu entwerfen und zu trainieren.
+Keras ist eine High-Level DL API, welche
+von François Chollet als Teil eines Forschungsprojekts entwickelt
+wurde und seit März 2015 ein Open-Source-Projekt ist
+\parencite[295]{book:hands-on-ml}. Keras kann
+unabhängig von TensorFlow verwendet werden, es benötigt
+jedoch eine Berechnungsgrundlage (wie TensorFlow und Co.),
+mit dem die für DL erforderlichen rechenintensiven Operationen durchgeführt werden können.
+In dieser Arbeit wird daher ausschließlich die \pythoninline{tf.keras} API
+verwendet. Ein Modell mit Keras zu entwerfen ist unkompliziert:
+\begin{pythoncode}
+from tensorflow import keras
+
+input_layer = keras.layers.Input(shape=[1])
+hidden1 = keras.layers.Dense(units=16, activation="relu")(input_layer)
+output_layer = keras.layers.Dense(units=1, name="output")(hidden1)
+
+model = keras.Model(inputs=input_layer, outputs=output_layer)
+\end{pythoncode}
+\begin{itemize}
+  \item Die erste Zeile importiert das Keras Modul von TensorFlow.
+  \item Als nächstes wird die Eingabeschicht des Netzes definiert.
+        Diese dient ausschließlich dazu, die Dimension der Eingabewerte festzulegen.
+        Da das Modell nur eine einzige Zahl entgegen nimmt,
+        ist die Dimension des Eingabevektors eins.
+  \item Die nächste Zeile definiert die erste und einzige verborgene Schicht mit
+        16 Neuronen (\textit{units}). Die Neuronen verwenden die ReLU
+        (\textit{Rectified Linear Unit}) Aktivierungsfunktion, welche wie folgt
+        definiert ist:
+        \begin{equation}
+          g(z) = ReLU(z) = \max(0, z)
+        \end{equation}
+        ReLU ist eine sehr beliebte Aktivierungsfunktion, die sich nicht
+        nur einfach berechnen lässt, sondern auch in der Praxis bewährt hat
+        und daher gut als Standardauswahl eignet. Es gibt viele
+        weitere Aktivierungsfunktion, welche häufig eingesetzt werden.
+        Vier der gewöhnlichsten sind in \autoref{activation-functions}
+        zu sehen.
+        \newpage
+        \begin{figure}[h!]
+          \centering
+          \includegraphics[width=0.7\textwidth]{first-nn/activation-functions.pdf}
+          \caption{Verschiedene Aktivierungsfunktionen \parencite[292]{book:hands-on-ml}}
+          \label{activation-functions}
+        \end{figure}
+  \item Die letzten beiden Zeilen definieren die Ausgabeschicht und das endgültige
+        Modell. Da das Ziel ist, einen einzigen Wert zu bestimmen, besitzt die letzte
+        Ebene lediglich eine Einheit. Es wird keine Aktivierungsfunktion angegeben,
+        was bedeutet, dass die Identitätsfunktion verwendet wird:
+        \begin{equation}
+          g(z) = z
+        \end{equation}
+\end{itemize}
+Die \pythoninline{model.summary()} Funktion liefert einige nützliche Informationen
+über das erstellte Netz, wie die verschieden Schichten, die Dimensionen
+der Aktivierungen (\pyconinline{None} bedeutet eine beliebige Stapelgröße)
+und die Anzahl der Parameter:
+\begin{pyconcode}
+>>> model.summary()
+Model: "model"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+input_1 (InputLayer)         [(None, 1)]               0         
+_________________________________________________________________
+dense (Dense)                (None, 16)                32        
+_________________________________________________________________
+output (Dense)               (None, 1)                 17        
+=================================================================
+Total params: 49
+Trainable params: 49
+Non-trainable params: 0
+_________________________________________________________________
+\end{pyconcode}
+Die erste verdeckte Schicht mit einer Eingabe und 16 Ausgaben besitzt
+32 Parameter, 16 Gewichte ($\#Eingaben \cdot \#Ausgaben$) und 16 Bias-Werte ($\#Ausgaben$).
+Die Ausgabeschicht mit 16 Eingaben und einer Ausgabe, besitzt
+17 Parameter, 16 Gewichte und ein Bias-Wert.
+Auf die einzelnen Schichten kann per Index oder Name zugegriffen werden:
+\begin{pyconcode}
+>>> model.layers
+[<tensorflow.python.keras.engine.input_layer.InputLayer at 0x225b4ca4310>,
+ <tensorflow.python.keras.layers.core.Dense at 0x225b4cb96d0>,
+ <tensorflow.python.keras.layers.core.Dense at 0x227629dea30>]
+>>> hidden1 = model.layers[1]
+>>> hidden1.name
+dense
+>>> model.get_layer("dense") is hidden1
+True
+\end{pyconcode}
+Die Parameter einer Schicht können ebenfalls untersucht werden,
+hierfür gibt es Methoden wie
+\pythoninline{get_weights()} und \pythoninline{set_weights()}:
+\begin{pyconcode}
+>>> weights, biases = hidden1.get_weights()
+>>> weights
+array([[ 0.49879968,  0.47782218, -0.1006788 , -0.4955549 , -0.4747857 ,
+        -0.5209702 ,  0.3174206 , -0.5282001 , -0.4355352 ,  0.44466698,
+        -0.4439075 , -0.5020016 ,  0.46326983,  0.42455995, -0.11190903,
+        -0.5314666 ]], dtype=float32)
+>>> weights.shape
+(1, 16)
+>>> biases
+array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+      dtype=float32)
+>>> biases.shape
+(16,)
+\end{pyconcode}
+Es ist zu sehen, dass die Gewichte der Ebene zufällig initialisiert wurden.
+Dies ist wichtig, um die Symmetrie der Verbindungen zu brechen,
+da sonst der Backpropagation-Algorithmus alle Gewichte gleichbehandeln würde
+und das Training ineffektiv ist \parencite[291]{book:hands-on-ml}.
+Für die Bias-Werte ist es in Ordnung, mit null zu initialisieren.
+Nachdem das Modell erstellt wurde, kann die \pythoninline{model.compile()}
+Funktion aufgerufen werden, um die Kostenfunktion und den
+Optimierungsalgorithmus festzulegen.
+Als alternatives drittes Argument kann eine Liste von
+zusätzlichen Metriken angegeben werden:
+\begin{pythoncode}
+sgd = keras.optimizers.SGD()
+model.compile(optimizer=sgd, loss="mse", metrics=["mae"])
+\end{pythoncode}
