@@ -1,4 +1,5 @@
 \chapter{Gradientenabstiegsverfahren}
+\label{appx:gradient-descent}
 Das Gradientenabstiegsverfahren oder einfach nur Gradientenverfahren
 (engl. \textit{gradient decent})
 ist ein allgemeiner Optimierungsalgorithmus
@@ -113,10 +114,12 @@ zwar einen Tiefpunkt finden, dieser ist jedoch nicht die bestmögliche Lösung d
 \noindent
 Wie in \autoref{fig:gd-mulitple-minima} zu sehen ist, kann
 der Gradientenabstieg in lokalen Minima hängen bleiben.
-% \begin{listing}[h!]
-%   \begin{minted}[escapeinside=||]{text}
-%     bis konvergiert:
-%       |$w_j = w_j - \alpha \cdot \frac{\partial}{\partial w_j}J(\yhat, y)$|
-%   \end{minted}
-%   \caption{Das Gradientenverfahren}
-% \end{listing}
+Für Kostenfunktionen mit mehr als einem Parameter
+umfasst das Gradientenverfahren einige extra Schritte.
+Für jeden zu trainierenden Parameter $\theta_{j}$ muss die
+partielle Ableitung der Kostenfunktionen bestimmt werden
+und diese wird verwendet, um den jeweiligen Parameter in einem Schritt anzupassen:
+\begin{equation}
+  \theta_{j} = \theta_j - \alpha \cdot \frac{\partial J}{\partial \theta_j}
+\end{equation}
+

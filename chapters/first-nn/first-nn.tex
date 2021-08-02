@@ -90,6 +90,7 @@ Die neuen Daten sehen wie folgt aus:
 \end{figure}
 
 \section{Aufteilen der Trainingsdaten}
+\label{sec:split-train-data}
 Um die Qualität eines Modells bewerten zu können, werden
 mehr Daten benötigt als lediglich die Trainingsbeispiele.
 Dies ist der Grund warum es für gewöhnlich mehr als nur einen
@@ -173,13 +174,13 @@ Der Aufbau eines einzelnen Neuron ist in \autoref{fig:nn-neuron} zu sehen.
 \end{figure}
 \noindent
 Als erster Schritt wird eine gewichtete Summe
-($z = w_1x_1 + w_2x_2 +\dotsb+ w_nx_n = \mathbf{x}^T\mathbf{w}$)
-der Eingabewerte berechnet. Die Elemente $\mathbf{x}$ und $\mathbf{w}$
+($z = w_1x_1 + w_2x_2 +\dotsb+ w_nx_n + b = \mathbf{x}^T\mathbf{w} + b$)
+der Eingabewerte plus Bias-Wert berechnet. Die Elemente $\mathbf{x}$ und $\mathbf{w}$
 sind Spaltenvektoren der Form: $(x_1,\dotsc,x_n)^T$ und $(w_1,\dotsc,w_n)^T$.
 \footnote{Wie immer wird versucht Berechnungen als Vektor- und Matrixoperationen
 auszudrücken um CPU und GPU Beschleunigung auszunutzen.}
-Der zweite Schritt wendet eine Aktivierungsfunktion auf diese Summe an und dies
-erzeugt die Ausgabe: $a = g(z)$. Die Ausgabe eines Neuron
+Der zweite Schritt wendet eine Aktivierungsfunktion auf das Ergebnis an und dies
+erzeugt die Ausgabe: $a = g(z)$. Die Ausgabe eines Neurons
 wird typischerweise die Aktivierung genannt. Ein neuronales Netz
 besteht aus der Komposition verschiedener Neuronen und die
 Gewichte stellen die erlernbaren Parameter dar.
@@ -227,19 +228,21 @@ wird typischerweise die mittlere quadratische Abweichung verwendet
   J(\mathbf{\hat{y}}, \mathbf{y}) =
   MSE(\mathbf{\hat{y}}, \mathbf{y}) =
     \frac{1}{m} \sum_{i=1}^{m} (\mathbf{\hat{y}}^{(i)} - \mathbf{y}^{(i)})^2
+  \label{eq:mse}
 \end{equation}
 Die Elemente $\mathbf{\hat{y}}$ und $\mathbf{y}$ sind Spaltenvektoren
 mit den Ausgaben des Netzes und den tatsächlichen Werten, die Zahl $m$
-ist Größe des Vektors, welche in diesem Fall gleich der Stapelgröße
+ist die Größe des Vektors, welche in diesem Fall gleich der Stapelgröße
 (engl. \textit{batch size}) ist. Der Index $\mathbf{v}^{(i)}$ ist keine Potenz,
 sondern beschreibt den i-ten Wert im Vektor $\mathbf{v}$.\\[4pt]
-Der Rückwärtsdurchlauf im letzten Schritt ist der eigentliche Teil, mit dem das Netz
+Der Rückwärtsdurchlauf im letzten Schritt ist der eigentliche Teil,
+mit dem das Netz
 trainiert wird. Der Algorithmus misst, wie stark jedes Gewicht den Fehler der
 vorherigen Schicht beeinflusst hat und versucht, diese so anzupassen,
 damit die Kostenfunktion minimiert wird.\\[8pt]
 TensorFlow und insbesondere die TensorFlow Keras API
 macht es einfach, neuronale Netze zu entwerfen und zu trainieren.
-Keras ist eine High-Level DL API, welche
+Keras ist eine High-Level Deep Learning API, welche
 von François Chollet als Teil eines Forschungsprojekts entwickelt
 wurde und seit März 2015 ein Open-Source-Projekt ist
 \parencite[295]{book:hands-on-ml}. Keras kann
@@ -292,7 +295,7 @@ model = keras.Model(inputs=input_layer, outputs=output_layer)
         \end{equation}
 \end{itemize}
 Die \pythoninline{model.summary()} Funktion liefert einige nützliche Informationen
-über das erstellte Netz, wie die verschieden Schichten, die Dimensionen
+über das erstellte Netz, wie die verschieden Schichten, die Dimension
 der Aktivierungen (\pyconinline{None} bedeutet eine beliebige Stapelgröße)
 und die Anzahl der Parameter:
 \begin{pyconcode}
@@ -329,15 +332,15 @@ dense
 True
 \end{pyconcode}
 Die Parameter einer Schicht können ebenfalls untersucht werden,
-hierfür gibt es Methoden wie
+hierfür gibt es Funktionen wie
 \pythoninline{get_weights()} und \pythoninline{set_weights()}:
 \begin{pyconcode}
 >>> weights, biases = hidden1.get_weights()
 >>> weights
-array([[ 0.49879968,  0.47782218, -0.1006788 , -0.4955549 , -0.4747857 ,
-        -0.5209702 ,  0.3174206 , -0.5282001 , -0.4355352 ,  0.44466698,
-        -0.4439075 , -0.5020016 ,  0.46326983,  0.42455995, -0.11190903,
-        -0.5314666 ]], dtype=float32)
+array([[ 0.5445634 , -0.5741172 , -0.2190957 , -0.40382388,  0.25530386,
+         0.34373027, -0.45763797, -0.1983017 , -0.3434852 ,  0.14649397,
+         0.57805157, -0.4487671 , -0.34861064,  0.44097137, -0.5695514 ,
+        -0.33477765]], dtype=float32)
 >>> weights.shape
 (1, 16)
 >>> biases
@@ -352,11 +355,139 @@ da sonst der Backpropagation-Algorithmus alle Gewichte gleichbehandeln würde
 und das Training ineffektiv ist \parencite[291]{book:hands-on-ml}.
 Für die Bias-Werte ist es in Ordnung, mit null zu initialisieren.
 Nachdem das Modell erstellt wurde, kann die \pythoninline{model.compile()}
-Funktion aufgerufen werden, um die Kostenfunktion und den
+Methode aufgerufen werden, um die Kostenfunktion und den
 Optimierungsalgorithmus festzulegen.
 Als alternatives drittes Argument kann eine Liste von
-zusätzlichen Metriken angegeben werden:
+zusätzlichen Messwerten angegeben werden:
 \begin{pythoncode}
 sgd = keras.optimizers.SGD()
 model.compile(optimizer=sgd, loss="mse", metrics=["mae"])
 \end{pythoncode}
+Als Kostenfunktion wird die mittlere quadratische Abweichung verwendet
+\eqref{eq:mse} und der Optimierungsalgorithmus ist
+\textit{stochastic gradient descent} (SGD). Gradientenabstieg
+(engl. \textit{gradient descent}) ist ein allgemeiner Optimierungsalgorithmus
+um eine Kostenfunktion zu minimieren \parencite[118]{book:hands-on-ml}.
+Es soll in dieser Arbeit nicht im Detail untersucht werden, wie dieser
+Algorithmus funktioniert, nichtsdestotrotz sind einige Intuitionen
+in \autoref{appx:gradient-descent} gegeben.
+Als zusätzlicher Messwert wird die mittlere absolute Abweichung
+(engl. \textit{mean absolute error}) angegeben.
+Die Gleichung ist sehr ähnlich wie die des $MSE$ nur das der absolute Fehler
+anstelle des quadratischen Fehlers gemessen wird:
+\begin{equation}
+  J(\mathbf{\hat{y}}, \mathbf{y}) =
+  MAE(\mathbf{\hat{y}}, \mathbf{y}) =
+    \frac{1}{m} \sum_{i=1}^{m} \vert\mathbf{\hat{y}}^{(i)} - \mathbf{y}^{(i)}\vert
+  \label{eq:mae}
+\end{equation}
+Die mittlere absolute Abweichung ist vor allem für ein Regressionsproblem
+ein gutes Maß, um abzuschätzen, wie stark Prognosen im Training von
+den Sollwerten abweichen.
+
+\section{Das Modell trainieren und bewerten}
+Das Netz ist nun bereit trainiert zu werden.
+Dies funktioniert den Aufruf der \pythoninline{fit} Methode:
+\begin{pyconcode}
+>>> EPOCHS = 300
+>>> BATCH_SIZE = 16
+>>> history = model.fit(x_train, y_train, epochs=EPOCHS,
+...                     batch_size=BATCH_SIZE, validation_data=(x_val, y_val))
+...
+Epoch 1/300
+63/63 [======] - 2s 4ms/step - loss: 0.5319     - mae: 0.6028
+                             - val_loss: 0.3588 - val_mae: 0.5075
+Epoch 2/300
+63/63 [======] - 0s 3ms/step - loss: 0.3422     - mae: 0.4941
+                             - val_loss: 0.2816 - val_mae: 0.4469
+[...]
+Epoch 300/300
+63/63 [======] - 0s 3ms/step - loss: 0.2138     - mae: 0.3667
+                             - val_loss: 0.2022 - val_mae: 0.3581
+\end{pyconcode}
+Wir übergeben das \textit{training set}, legen die Epochenzahl fest
+und geben eine Stapelgröße an.
+Als optionales Argument wird außerdem das \textit{validation set}
+übergeben. Die Stapelgröße zeigt, wie viele Trainingsdaten betrachten werden,
+bevor die Kostenfunktion bestimmt und die Gewichte und Bias-Werte
+des Netzes einmal angepasst werden
+(wie häufig ein Schritt des Gradientenabstiegs durchgeführt wird).
+In \autoref{sec:split-train-data} wurden \qty{50}{\percent} der Daten
+als \textit{training set} verwendet:
+\begin{pyconcode}
+>>> x_train.shape # 2000 * 50% = 1000
+TensorShape([1000, 1])
+\end{pyconcode}
+Wie in der obigen Ausgabe zu sehen ist, macht dies
+pro Epoche 63 ($1000 / 16 = \num{62.5}$) Gewichts- und Bias-Aktualisierungen.
+Durch erneutes Betrachten der Parameter der verdeckten Schicht
+können die Veränderungen beobachtet werden:
+\begin{pyconcode}
+>>> weights, biases = hidden1.get_weights()
+>>> weights
+array([[ 0.48667195, -0.5741172 , -0.2190957 , -0.40382388,  0.43343315,
+         0.23612429, -0.45763797, -0.1983017 , -0.3434852 ,  0.78601366,
+         0.55660075, -0.4487671 , -0.34861064,  0.41839585, -0.5695514 ,
+        -0.33477765]], dtype=float32)
+>>> biases
+array([-0.6504988 ,  0.        ,  0.        ,  0.        , -0.5743087 ,
+       -0.0035082 ,  0.        ,  0.        ,  0.        , -0.97527677,
+       -0.00748931,  0.        ,  0.        , -0.00579915,  0.        ,
+        0.        ], dtype=float32)
+\end{pyconcode}
+Die Keras Ausgabe enthält weitere nützliche Informationen:
+\begin{description}[font=\normalfont, style=nextline]
+\item[\pyconinline{loss} und \pyconinline{val_loss}]
+Die Ausgabe der Kostenfunktion für das \textit{training} und \textit{validation set}.
+Es ist zu sehen das der Fehler während dem Training für beide Datensätze abnimmt,
+was ein gutes Zeichen ist.
+\item[\pyconinline{mae} und \pyconinline{val_mae}]
+Die mittlere absolute Abweichung. Wie auch die Kostenfunktion
+nimmt diese für beide Datensätze während dem Training ab.
+Ein absoluter Fehler von \num{0.3667}
+nach 300 Epochen ist noch immer relativ hoch.
+Angesichts der Tatsache, dass mögliche Werte ungefähr im
+Bereich $[-1, 1]$ liegen.
+Dies könnte bedeuten, dass es das Netz nicht geschafft hat, die Daten
+gut zu modellieren. Mehr Einblick kann gegeben werden, sobald
+das Modell getestet und die Ergebnisse grafisch dargestellt werden.
+\end{description}
+
+\subsection{Grafische Darstellung des Trainings}
+Die \pythoninline{fit} Methode gibt ein \pythoninline{History} Objekt zurück.
+Ihr \pythoninline{History.history} Attribut
+ist eine Aufzeichnung aller Messwerte in aufeinanderfolgenden Epochen:
+\begin{pyconcode}
+>>> history.history.keys()
+dict_keys(["loss", "mae", "val_loss", "val_mae"])
+>>> mse = history.history["loss"]
+>>> val_mse = history.history["val_loss"]
+>>> mae = history.history["mae"]
+>>> val_mae = history.history["val_mae"]
+>>> len(mse) == len(val_mse) == len(mae) == len(val_mae) == EPOCHS
+True
+\end{pyconcode}
+Diese Aufzeichnungen können nun verwendet werden um die Trainingswerte
+in Bezug auf die Epochenzahl darzustellen:
+\begin{pythoncode}
+import matplotlib.pyplot as plt
+
+epochs = tf.range(0.0, EPOCHS)
+
+plt.subplot(211)
+plt.plot(epochs, mse, "b-", label="Training")
+plt.plot(epochs, val_mse, "g-", label="Validation")
+plt.subplot(212)
+plt.plot(epochs, mae, "b-", label="Training")
+plt.plot(epochs, val_mae, "g-", label="Validation")
+# Mehr Code für Achsenbeschriftung und Legende ...
+plt.show()
+\end{pythoncode}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{first-nn/1-metrics.pdf}
+  \caption{Trainingskurven: Der durchschnittliche \textit{training}
+  $MSE$ und $MAE$ gemessen während jeder Epoche
+  und der durchschnittliche \textit{validation} $MSE$ und $MAE$
+  gemessen am Ende jeder Epoche}
+\end{figure}
