@@ -1,8 +1,8 @@
 \chapter{Trainieren des ersten Neuronale Netzes}
 In dem vorherigen Kapitel haben wir gesehen,
 was Maschinelles Lernen bedeutet, welche
-Probleme es hilft zu lösen und warum
-Deep Learning sich in der heutigen Zeit mehr und mehr durchsetzt.
+Probleme es hilft zu lösen und warum sich
+Deep Learning in der heutigen Zeit mehr und mehr durchsetzt.
 Es konnte außerdem das Ziel dieser Arbeit
 beschrieben und einen ersten Einblick
 in die verwendete Hardware gegeben werden.
@@ -15,6 +15,7 @@ Das Kapitel ist gegliedert nach den folgenden Schritten:
   \item Hole den Trainingsdatensatz.
   \item Trainiere ein neuronales Netz mit TensorFlow.
   \item Bewerte die Ergebnisse des Modells.
+  \item Verbessere das Modell.
   \item Konvertiere das Modell in ein mobil- und TPU-kompatibles Format.
   \item Schreibe Code, um auf dem Gerät Prognosen durchzuführen.
 \end{enumerate}
@@ -38,7 +39,7 @@ bereits anspruchsvollere, nicht lineare Daten gut modelliert werden können.
 Die Sinusfunktion ist in \autoref{plot:sine-curve} zu sehen.
 \begin{figure}[!h]
   \centering
-  \includegraphics[width=0.7\textwidth]{first-nn/sine-curve.pdf}
+  \includegraphics[width=\plotw]{first-nn/sine-curve.pdf}
   \caption{Die Sinusfunktion}
   \label{plot:sine-curve}
 \end{figure}
@@ -71,7 +72,7 @@ Dieser Bereich nennt sich die Periode der Sinusfunktion,
 da sich die Funktionswerte von dort an immer wiederholen:
 \begin{figure}[!h]
   \centering
-  \includegraphics[width=0.7\textwidth]{first-nn/sine-data.pdf}
+  \includegraphics[width=\plotw]{first-nn/sine-data.pdf}
   \caption{Die generierten Daten}
 \end{figure}
 
@@ -85,7 +86,7 @@ Die neuen Daten sehen wie folgt aus:
 \newpage
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.7\textwidth]{first-nn/sine-data-noise.pdf}
+  \includegraphics[width=\plotw]{first-nn/sine-data-noise.pdf}
   \caption{Die generierten Daten plus zufälliges Rauschen}
 \end{figure}
 
@@ -114,7 +115,7 @@ Fehlerquellen wie der Überanpassung (dem Gegenstück zur Unteranpassung, engl.
 Die folgende Abbildung soll die beiden Begriffe deutlich machen.
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.7\textwidth]{first-nn/over_underfitting.pdf}
+  \includegraphics[width=\plotw]{first-nn/over_underfitting.pdf}
   \caption{Überanpassung und Unteranpassung am Beispiel einer
   quadratischen Funktion \parencite[131]{book:hands-on-ml}}
 \end{figure}
@@ -136,10 +137,10 @@ Um die zuvor generierten Trainingsdaten aufzuteilen,
 kann die TensorFlow Methode \pythoninline{tf.split}
 verwendet werden:
 \begin{pythoncode}
-# Wir verwenden 50% der Daten für training und 20% für testing.
-# Die restlichen 30% werden für validation verwendet.
+# Wir verwenden 50% der Daten für training und 30% für testing.
+# Die restlichen 20% werden für validation verwendet.
 TRAIN_SIZE = int(0.5 * SAMPLES)
-TEST_SIZE = int(0.2 * SAMPLES)
+TEST_SIZE = int(0.3 * SAMPLES)
 VAL_SIZE = SAMPLES - TRAIN_SIZE - TEST_SIZE
 
 # Gliedere den Datensatz in drei Teile auf
@@ -149,15 +150,16 @@ y_train, y_test, y_val = tf.split(y, [TRAIN_SIZE, TEST_SIZE, VAL_SIZE])
 # Verifiziere die Aufteilung, durch summieren der Größen
 assert tf.size(x_train) + tf.size(x_test) + tf.size(x_val) == SAMPLES
 \end{pythoncode}
-Die drei Datensätze können nun in der folgenden Abbildung farblich dargestellt werden.
+Die drei Datensätze können in der folgenden Abbildung farblich dargestellt werden.
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.7\textwidth]{first-nn/sine-data-noise-split.pdf}
+  \includegraphics[width=\plotw]{first-nn/sine-data-noise-split.pdf}
   \caption{Aufteilung der Sinusdaten in
   \textit{training}, \textit{validation} und \textit{test set}}
 \end{figure}
 
 \section{Entwurf des ersten Modells}
+\label{sec:modellentwurf}
 Ein neuronales Netz besteht aus mehreren kleinen Einheiten (auch Neuronen genannt).
 Jedes Neuron nimmt entgegen ein bis $n$ numerische Eingaben, führt einige
 einfache Berechnungen durch und produziert eine numerische Ausgabe.
@@ -179,7 +181,7 @@ der Eingabewerte plus Bias-Wert berechnet. Die Elemente $\mathbf{x}$ und $\mathb
 sind Spaltenvektoren der Form: $(x_1,\dotsc,x_n)^T$ und $(w_1,\dotsc,w_n)^T$.
 \footnote{Wie immer wird versucht Berechnungen als Vektor- und Matrixoperationen
 auszudrücken um CPU und GPU Beschleunigung auszunutzen.}
-Der zweite Schritt wendet eine Aktivierungsfunktion auf das Ergebnis an und dies
+Der zweite Schritt wendet eine Aktivierungsfunktion auf diese Summe an und dies
 erzeugt die Ausgabe: $a = g(z)$. Die Ausgabe eines Neurons
 wird typischerweise die Aktivierung genannt. Ein neuronales Netz
 besteht aus der Komposition verschiedener Neuronen und die
@@ -282,7 +284,7 @@ model = keras.Model(inputs=input_layer, outputs=output_layer)
         \newpage
         \begin{figure}[h!]
           \centering
-          \includegraphics[width=0.7\textwidth]{first-nn/activation-functions.pdf}
+          \includegraphics[width=\plotw]{first-nn/activation-functions.pdf}
           \caption{Verschiedene Aktivierungsfunktionen \parencite[292]{book:hands-on-ml}}
           \label{activation-functions}
         \end{figure}
@@ -386,7 +388,7 @@ ein gutes Maß, um abzuschätzen, wie stark Prognosen im Training von
 den Sollwerten abweichen.
 
 \section{Das Modell trainieren und bewerten}
-Das Netz ist nun bereit trainiert zu werden.
+Das Netz ist nun bereit um trainiert zu werden.
 Dies funktioniert den Aufruf der \pythoninline{fit} Methode:
 \begin{pyconcode}
 >>> EPOCHS = 300
@@ -396,14 +398,14 @@ Dies funktioniert den Aufruf der \pythoninline{fit} Methode:
 ...
 Epoch 1/300
 63/63 [======] - 2s 4ms/step - loss: 0.5319     - mae: 0.6028
-                             - val_loss: 0.3588 - val_mae: 0.5075
+                             - val_loss: 0.3661 - val_mae: 0.5134
 Epoch 2/300
 63/63 [======] - 0s 3ms/step - loss: 0.3422     - mae: 0.4941
-                             - val_loss: 0.2816 - val_mae: 0.4469
+                             - val_loss: 0.2898 - val_mae: 0.4533
 [...]
 Epoch 300/300
 63/63 [======] - 0s 3ms/step - loss: 0.2138     - mae: 0.3667
-                             - val_loss: 0.2022 - val_mae: 0.3581
+                             - val_loss: 0.2135 - val_mae: 0.3671
 \end{pyconcode}
 Wir übergeben das \textit{training set}, legen die Epochenzahl fest
 und geben eine Stapelgröße an.
@@ -418,23 +420,25 @@ als \textit{training set} verwendet:
 >>> x_train.shape # 2000 * 50% = 1000
 TensorShape([1000, 1])
 \end{pyconcode}
-Wie in der obigen Ausgabe zu sehen ist, macht dies
+Wie in der oberen Ausgabe zu sehen ist, macht dies
 pro Epoche 63 ($1000 / 16 = \num{62.5}$) Gewichts- und Bias-Aktualisierungen.
-Durch erneutes Betrachten der Parameter der verdeckten Schicht
-können die Veränderungen beobachtet werden:
+Durch erneutes Betrachten der Parameter können die Veränderungen beobachtet werden:
 \begin{pyconcode}
+>>> hidden1 = model.get_layer("dense")
 >>> weights, biases = hidden1.get_weights()
 >>> weights
-array([[ 0.48667195, -0.5741172 , -0.2190957 , -0.40382388,  0.43343315,
-         0.23612429, -0.45763797, -0.1983017 , -0.3434852 ,  0.78601366,
-         0.55660075, -0.4487671 , -0.34861064,  0.41839585, -0.5695514 ,
+array([[ 0.48667157, -0.5741172 , -0.2190957 , -0.40382388,  0.43343386,
+         0.23612383, -0.45763797, -0.1983017 , -0.3434852 ,  0.7860139 ,
+         0.55660063, -0.4487671 , -0.34861064,  0.41839647, -0.5695514 ,
         -0.33477765]], dtype=float32)
 >>> biases
-array([-0.6504988 ,  0.        ,  0.        ,  0.        , -0.5743087 ,
-       -0.0035082 ,  0.        ,  0.        ,  0.        , -0.97527677,
-       -0.00748931,  0.        ,  0.        , -0.00579915,  0.        ,
+array([-0.6504982 ,  0.        ,  0.        ,  0.        , -0.5743109 ,
+       -0.00350828,  0.        ,  0.        ,  0.        , -0.9752765 ,
+       -0.00748946,  0.        ,  0.        , -0.00579908,  0.        ,
         0.        ], dtype=float32)
 \end{pyconcode}
+Nicht alle Parameter der verdeckten Schicht wurden angepasst, einige
+Änderungen an den Bias-Werten sind jedoch gut zu erkennen.
 Die Keras Ausgabe enthält weitere nützliche Informationen:
 \begin{description}[font=\normalfont, style=nextline]
 \item[\pyconinline{loss} und \pyconinline{val_loss}]
@@ -445,7 +449,7 @@ was ein gutes Zeichen ist.
 Die mittlere absolute Abweichung. Wie auch die Kostenfunktion
 nimmt diese für beide Datensätze während dem Training ab.
 Ein absoluter Fehler von \num{0.3667}
-nach 300 Epochen ist noch immer relativ hoch.
+nach 300 Epochen ist allerdings noch immer relativ hoch.
 Angesichts der Tatsache, dass mögliche Werte ungefähr im
 Bereich $[-1, 1]$ liegen.
 Dies könnte bedeuten, dass es das Netz nicht geschafft hat, die Daten
@@ -467,27 +471,197 @@ dict_keys(["loss", "mae", "val_loss", "val_mae"])
 >>> len(mse) == len(val_mse) == len(mae) == len(val_mae) == EPOCHS
 True
 \end{pyconcode}
-Diese Aufzeichnungen können nun verwendet werden um die Trainingswerte
+Diese Aufzeichnungen können verwendet werden um die Trainingswerte
 in Bezug auf die Epochenzahl darzustellen:
 \begin{pythoncode}
 import matplotlib.pyplot as plt
 
 epochs = tf.range(0.0, EPOCHS)
 
-plt.subplot(211)
-plt.plot(epochs, mse, "b-", label="Training")
-plt.plot(epochs, val_mse, "g-", label="Validation")
-plt.subplot(212)
-plt.plot(epochs, mae, "b-", label="Training")
-plt.plot(epochs, val_mae, "g-", label="Validation")
-# Mehr Code für Achsenbeschriftung und Legende ...
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=[6.4, 8])
+
+# Stelle den MSE für beide Datensätze dar
+ax1.plot(epochs, mse, "b-", label="Training")
+ax1.plot(epochs, val_mse, "g-", label="Validation")
+ax1.grid()
+ax1.set_ylabel("$MSE$", labelpad=12)
+ax1.legend(loc="upper right")
+ax1.axis([0, EPOCHS, 0.18, 0.4])
+
+# Stelle den MAE für beide Datensätze dar
+ax2.plot(epochs, mae, "b-", label="Training")
+ax2.plot(epochs, val_mae, "g-", label="Validation")
+ax2.grid()
+ax2.set_xlabel("Epochen")
+ax2.set_ylabel("$MAE$", labelpad=12)
+ax2.axis([0, EPOCHS, 0.35, 0.45])
+
+plt.show()
+\end{pythoncode}
+\newpage
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\plotw]{first-nn/1-metrics.pdf}
+  \caption{Trainingskurven: Der durchschnittliche \textit{training}
+  $MSE$ und $MAE$ gemessen während jeder Epoche
+  und der \textit{validation} $MSE$ und $MAE$
+  gemessen am Ende jeder Epoche}
+\end{figure}
+\noindent
+Es ist zu sehen, dass beide Fehler sowohl für das
+\textit{training set} als auch das \textit{validation set}
+zu Beginn des Trainings stark fallen.
+Die Werte sind relativ nahe beieinander, wobei die Validierungsfehler
+teilweise stark variieren, aber auf keine Überanpassung hin deuten.
+Das Modell scheint nach etwa 100 bis 150 Epochen für beide Graphen
+keinen großen Fortschritt mehr zu machen, weshalb
+das Training bereits frühzeitig beendet werden könnte.
+Der Fehler auf dem \textit{validation set} wird
+am Ende jeder Epoche gemessen, während der Trainingsfehler als Durchschnittswert
+während der Epoche bestimmt wird \parencite[305]{book:hands-on-ml}.
+Dies ist der Grund, warum der Validierungsfehler
+vereinzelt kleiner als der Trainingsfehler ist, was ungewöhnlich sein sollte:
+Das Modell wurde zum Zeitpunkt der Berechnung ein wenig länger trainiert.
+
+\subsection{Grafische Darstellung der Prognosen}
+Um die Qualität des Modells weiter zu beurteilen, können einige
+Prognosen mit dem \textit{training} oder \textit{validation set}
+durchgeführt und die Ergebnisse angezeigt werden:
+\begin{pythoncode}
+predictions = model.predict(x_val)
+
+# Zeige die Prognosen zusammen mit den Sollwerten an
+plt.plot(x_val, y_val, "b.", label="Validierungsdaten")
+plt.plot(x_val, predictions, "y.", label="Prognose")
+[...] # Legende und die Daten der Sinuskurve
 plt.show()
 \end{pythoncode}
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.7\textwidth]{first-nn/1-metrics.pdf}
-  \caption{Trainingskurven: Der durchschnittliche \textit{training}
-  $MSE$ und $MAE$ gemessen während jeder Epoche
-  und der durchschnittliche \textit{validation} $MSE$ und $MAE$
-  gemessen am Ende jeder Epoche}
+  \includegraphics[width=\plotw]{first-nn/1-predictions_val.pdf}
+  \caption{Ein Graph der Prognosen des Modells gegenüber der Sollwerte aus dem
+  \textit{validation set} zusammen mit der Sinuskurve als Referenz}
+  \label{fig:sine-underfitting}
 \end{figure}
+Oje, \autoref{fig:sine-underfitting} macht die zuvor gestellte Vermutung klar.
+Das Modell hat es nur in einer sehr beschränkten Weise
+geschafft, die Sinuskurve zu ap­pro­xi­mie­ren.
+Es ist also Zeit, zurück ans Zeichenbrett zu gehen und
+das Modell anzupassen, um die Qualität am \textit{validation set}
+zu verbessern.
+
+\section{Das Modell verbessern}
+Es scheint, als wäre das zuvor entworfene Modell nicht mächtig genug,
+um die Daten ausreichend gut zu beschreiben.
+Um dieser Unteranpassung vorzubeugen, muss die Komplexität des Netzes
+erhöht werden. Hierfür gibt es zwei Möglichkeiten:
+Hinzufügen weiterer Schichten oder Erhöhen der Neuronenanzahl.
+Das Netz soll durch zwei zusätzliche Schichten erweitert werden:
+\begin{pythoncode}
+input_layer = keras.Input(shape=[1])
+# Erste neue Schicht mit 8 Einheiten
+hidden1 = keras.layers.Dense(units=8, activation="relu")(input_layer)
+# Alte Schicht mit 16 Einheiten
+hidden2 = keras.layers.Dense(units=16, activation="relu")(hidden1)
+# Zweite neue Schicht mit 32 Einheiten
+hidden3 = keras.layers.Dense(units=32, activation="relu")(hidden2)
+output_layer = keras.layers.Dense(1, name="output")(hidden3)
+
+model = keras.Model(inputs=input_layer, outputs=output_layer)
+\end{pythoncode}
+Die Übersicht gibt Auskunft über die Anzahl der Parameter:
+\begin{pyconcode}
+>>> model.summary()
+Model: "model"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+input_1 (InputLayer)         [(None, 1)]               0         
+_________________________________________________________________
+dense (Dense)                (None, 8)                 16        
+_________________________________________________________________
+dense_1 (Dense)              (None, 16)                144       
+_________________________________________________________________
+dense_2 (Dense)              (None, 32)                544       
+_________________________________________________________________
+output (Dense)               (None, 1)                 33        
+=================================================================
+Total params: 737
+Trainable params: 737
+Non-trainable params: 0
+_________________________________________________________________
+\end{pyconcode}
+737 im Vergleich zu den 49 Parametern des alten Modells.
+Dies sollte dem Netz sehr viel mehr Spielraum gegeben,
+die Daten gut zu beschreiben.
+Das Training funktioniert in gleicherweise wie zuvor:
+\begin{pyconcode}
+>>> sgd = keras.optimizers.SGD()
+>>> model.compile(optimizer=sgd, loss="mse", metrics=["mae"])
+>>> history = model.fit(x_train, y_train, epochs=EPOCHS,
+...                     batch_size=BATCH_SIZE, validation_data=(x_val, y_val))
+...
+Epoch 1/300
+63/63 [======] - 0s 4ms/step - loss: 0.4988     - mae: 0.6041
+                             - val_loss: 0.3944 - val_mae: 0.5356
+[...]
+Epoch 300/300
+63/63 [======] - 0s 4ms/step - loss: 0.0646     - mae: 0.2027
+                             - val_loss: 0.0710 - val_mae: 0.2125
+\end{pyconcode}
+Auch die Trainingskurven können nach demselben Prinzip
+generiert werden:
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\plotw]{first-nn/2-metrics.pdf}
+  \caption{Trainingskurven des angepassten Modells}
+\end{figure}
+
+\noindent
+Die Trainingsergebnisse sind vielsprechend, sowohl MSE als auch MAE
+sind um einiges niedriger als zuvor und die Trainingskurven
+sehen allgemein stabiler aus mit weniger großen Ausreißern.
+Die grafische Darstellung der Prognosen bestätigt dieses Ergebnis:
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\plotw]{first-nn/2-predictions_val.pdf}
+  \caption{Ein Graph der Prognosen des verbesserten Modells gegenüber der Sollwerte aus dem
+  \textit{validation set} zusammen mit der Sinuskurve als Referenz}
+\end{figure}
+
+\noindent
+Das Netz scheint die Daten trotz Rauschen gut beschreiben zu können.
+Die Kurve ist nicht vollständig glatt, was eine leichte Überanpassung der Trainingsdaten
+indiziert. Möchte das Modell weiter verbessert werden,
+könnte das Training regularisiert
+oder mehr Trainingsdaten gesammelt werden
+(vgl. Verhinderung von Überanpassung, \cite[28]{book:hands-on-ml}).
+Ist die Leistung des Modells am \textit{validation set} zufriedenstellend,
+kann in den letzten Schritt übergegangen werden: Die Evaluierung am \textit{test set}.
+Keras bietet hierfür die Methode \pythoninline{evaluate} an:
+\begin{pyconcode}
+>>> model.evaluate(x_test, y_test)
+19/19 [======] - 0s 2ms/step - loss: 0.0706 - mae: 0.2078
+[0.07061798125505447, 0.20783697068691254]
+\end{pyconcode}
+Sowohl die Werte des $MSE$ als auch die des $MAE$ sind sehr ähnlich
+wie die aus dem Training. Das Netz schafft es also auch für
+bislang ungesehene Daten gute Schlüsse ziehen.
+Es ist wichtig, der Versuchung zu widerstehen, das Modell nach
+der Evaluierung am \textit{test set} weiter anzupassen, da die Abschätzung
+des Generalisierungsfehlers ansonsten zu optimistisch wäre
+\parencite[80]{book:hands-on-ml}.
+Für eine letzte Bestätigung können auch die Vorhersagen
+der Testdaten ein letztes Mal grafisch dargestellt werden:
+\begin{pythoncode}
+predictions = model.predict(x_test)
+[...] # Wie zuvor
+\end{pythoncode}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\plotw]{first-nn/2-predictions.pdf}
+  \caption{Ein Graph der Prognosen des verbesserten Modells gegenüber der Sollwerte aus dem
+  \textit{test set} zusammen mit der Sinuskurve als Referenz}
+\end{figure}
+
+\section{Konvertierung des Modells nach TensorFlow Lite}
