@@ -22,12 +22,12 @@ Die folgende Schritte beschreiben das Vorgehen:
 \begin{enumerate}
   \item Wähle einen zufälligen Startpunkt $x$.
   \item Bestimme die Steigung der Funktion in diesem Punkt.
-  \item Mache einen Schritt in Richtung des Abhangs und aktualisiere den $x$-Wert.
+  \item Mache einen Schritt in die Richtung des Abhangs und aktualisiere den $x$-Wert.
   \item Wiederhole Schritt zwei bis drei so lange,
         bis sich $x$ nicht mehr oder nur noch sehr wenig ändert.
 \end{enumerate}
 Um die Steigung zu bestimmen, muss die Ableitung der Kostenfunktion ermittelt werden.
-\autoref{eq:one-step-gd-x2} zeigt einen Durchlauf der eben beschriebenen Schritte.
+\autoref{eq:one-step-gd-x2} zeigt einen Durchlauf der eben beschriebenen Schritte:
 \begin{equation}
   x = x - \alpha \cdot \frac{\mathrm{d}J}{\mathrm{d}x} = x - \alpha \cdot 2x
   \label{eq:one-step-gd-x2}
@@ -96,7 +96,7 @@ Betrachten wir den folgenden Fall:
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.75\textwidth]{gradient-decent/mulitple-minima.pdf}
-  \caption{Kostenfunktion mit globalem und lokalem Minimum}
+  \caption{Kostenfunktion mit globalem als auch lokalem Minimum}
   \label{fig:mulitple-minima}
 \end{figure}
 

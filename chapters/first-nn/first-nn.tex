@@ -69,21 +69,12 @@ Der vorhergehende Code generiert zwei Spaltenvektoren
 (Trainingsdaten \pythoninline{x} und Label \pythoninline{y})
 mit jeweils 2000 Werten im Bereich 0 bis $2\pi$.
 Dieser Bereich nennt sich die Periode der Sinusfunktion,
-da sich die Funktionswerte von dort an immer wiederholen:
-\begin{figure}[!h]
-  \centering
-  \includegraphics[width=\plotw]{first-nn/sine-data.pdf}
-  \caption{Die generierten Daten}
-\end{figure}
-
-\noindent
+da sich die Funktionswerte von dort an immer wiederholen.
 Damit das Problem realistischer ist, wird auch für diese Daten
 zufälliges Rauschen hinzugefügt:
 \begin{pythoncode}
 y += 0.25 * tf.random.normal(y.shape)
 \end{pythoncode}
-Die neuen Daten sehen wie folgt aus:
-\newpage
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\plotw]{first-nn/sine-data-noise.pdf}
@@ -115,7 +106,7 @@ Fehlerquellen wie der Überanpassung (dem Gegenstück zur Unteranpassung, engl.
 Die folgende Abbildung soll die beiden Begriffe deutlich machen.
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{first-nn/over_underfitting.pdf}
+  \includegraphics[width=\plotbw]{first-nn/over_underfitting.pdf}
   \caption{Überanpassung und Unteranpassung am Beispiel einer
   quadratischen Funktion \parencite[131]{book:hands-on-ml}}
 \end{figure}
@@ -123,9 +114,9 @@ Die folgende Abbildung soll die beiden Begriffe deutlich machen.
 \noindent
 Modelliert ein Algorithmus die Struktur der Trainingsdaten zu gut, dann
 ist die Rede von Überanpassung. Dies ist zu sehen
-durch die grüne Linie. Die Funktion mag die Trainingsdaten
-am besten beschreiben, schafft es aber nicht auf neue
-Daten zu verallgemeinern.
+durch die grüne Linie. Die Funktion mit sehr vielen Features
+mag die Trainingsdaten am besten beschreiben,
+schafft es aber nicht auf neue Daten zu verallgemeinern.
 Überanpassung kann erkannt werden, wenn die Leistung des Modells am
 \textit{training set} steigt, während sie am \textit{validation set}
 sinkt. Das Gegenstück der Überanpassung ist die
@@ -150,7 +141,7 @@ y_train, y_test, y_val = tf.split(y, [TRAIN_SIZE, TEST_SIZE, VAL_SIZE])
 # Verifiziere die Aufteilung, durch summieren der Größen
 assert tf.size(x_train) + tf.size(x_test) + tf.size(x_val) == SAMPLES
 \end{pythoncode}
-Die drei Datensätze können in der folgenden Abbildung farblich dargestellt werden.
+Die drei Datensätze können in der folgenden Abbildung farblich dargestellt werden:
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\plotw]{first-nn/sine-data-noise-split.pdf}
@@ -167,13 +158,13 @@ Alleine kann ein Neuron kaum die einfachsten Probleme lösen, doch zusammen
 durch Komposition und Training haben sie das Potenzial,
 die komplexe Welt verstehen.
 Der Aufbau eines einzelnen Neuron ist in \autoref{fig:nn-neuron} zu sehen.
-\newpage
 \begin{figure}[h!]
   \centering
   \includegraphics{first-nn/nn-neuron.pdf}
   \caption{Der Aufbau eines einzelnen Neuron}
   \label{fig:nn-neuron}
 \end{figure}
+
 \noindent
 Als erster Schritt wird eine gewichtete Summe
 ($z = w_1x_1 + w_2x_2 +\dotsb+ w_nx_n + b = \mathbf{x}^T\mathbf{w} + b$)
@@ -185,7 +176,7 @@ Der zweite Schritt wendet eine Aktivierungsfunktion auf diese Summe an und dies
 erzeugt die Ausgabe: $a = g(z)$. Die Ausgabe eines Neurons
 wird typischerweise die Aktivierung genannt. Ein neuronales Netz
 besteht aus der Komposition verschiedener Neuronen und die
-Gewichte stellen die erlernbaren Parameter dar.
+Gewichte und Bias-Werte stellen die erlernbaren Parameter dar.
 \begin{figure}[h!]
   \centering
   \includegraphics{first-nn/example-nn.pdf}
@@ -212,7 +203,8 @@ Deep Learning, da der Schwerpunkt dieser Arbeit auf der Entwicklung einer
 Anwendung liegt, werden wir nicht im Detail untersuchen,
 wie dieser und verwandte Algorithmen wie das Gradientenabstiegsverfahren
 funktionieren. Zusätzlich können diese Methoden durch Deep-Learning-Bibliotheken
-wie TensorFlow automatisiert werden.\\[8pt]
+wie TensorFlow automatisiert werden. Es wird jedoch versucht, einige
+Intuitionen zu geben.\\[8pt]
 Kurzum \parencite[290-291]{book:hands-on-ml}:
 Backpropagation besteht aus zwei Phasen: einem Vorwärtsdurchlauf
 und einem Rückwärtsdurchlauf. Die Daten werden stapelweise verarbeitet
@@ -281,7 +273,6 @@ model = keras.Model(inputs=input_layer, outputs=output_layer)
         weitere Aktivierungsfunktion, welche häufig eingesetzt werden.
         Vier der gewöhnlichsten sind in \autoref{activation-functions}
         zu sehen.
-        \newpage
         \begin{figure}[h!]
           \centering
           \includegraphics[width=\plotw]{first-nn/activation-functions.pdf}
@@ -297,7 +288,7 @@ model = keras.Model(inputs=input_layer, outputs=output_layer)
         \end{equation}
 \end{itemize}
 Die \pythoninline{model.summary()} Funktion liefert einige nützliche Informationen
-über das erstellte Netz, wie die verschieden Schichten, die Dimension
+über das erstellte Netz, wie die verschiedenen Schichten, die Dimension
 der Aktivierungen (\pyconinline{None} bedeutet eine beliebige Stapelgröße)
 und die Anzahl der Parameter:
 \begin{pyconcode}
@@ -367,8 +358,8 @@ model.compile(optimizer=sgd, loss="mse", metrics=["mae"])
 \end{pythoncode}
 Als Kostenfunktion wird die mittlere quadratische Abweichung verwendet
 \eqref{eq:mse} und der Optimierungsalgorithmus ist
-\textit{stochastic gradient descent} (SGD). Gradientenabstieg
-(engl. \textit{gradient descent}) ist ein allgemeiner Optimierungsalgorithmus
+\textit{stochastic gradient descent} (SGD). \textit{Gradient descent}
+(dt. Gradientenabstieg) ist ein allgemeiner Optimierungsalgorithmus
 um eine Kostenfunktion zu minimieren \parencite[118]{book:hands-on-ml}.
 Es soll in dieser Arbeit nicht im Detail untersucht werden, wie dieser
 Algorithmus funktioniert, nichtsdestotrotz sind einige Intuitionen
@@ -388,6 +379,7 @@ ein gutes Maß, um abzuschätzen, wie stark Prognosen im Training von
 den Sollwerten abweichen.
 
 \section{Das Modell trainieren und bewerten}
+\label{sec:train-evaluate-model}
 Das Netz ist nun bereit um trainiert zu werden.
 Dies funktioniert den Aufruf der \pythoninline{fit} Methode:
 \begin{pyconcode}
@@ -422,7 +414,8 @@ TensorShape([1000, 1])
 \end{pyconcode}
 Wie in der oberen Ausgabe zu sehen ist, macht dies
 pro Epoche 63 ($1000 / 16 = \num{62.5}$) Gewichts- und Bias-Aktualisierungen.
-Durch erneutes Betrachten der Parameter können die Veränderungen beobachtet werden:
+Durch erneutes Betrachten der Parameter nach dem Training
+können die Veränderungen beobachtet werden:
 \begin{pyconcode}
 >>> hidden1 = model.get_layer("dense")
 >>> weights, biases = hidden1.get_weights()
@@ -483,22 +476,15 @@ fig, (ax1, ax2) = plt.subplots(2, 1, figsize=[6.4, 8])
 # Stelle den MSE für beide Datensätze dar
 ax1.plot(epochs, mse, "b-", label="Training")
 ax1.plot(epochs, val_mse, "g-", label="Validation")
-ax1.grid()
-ax1.set_ylabel("$MSE$", labelpad=12)
-ax1.legend(loc="upper right")
-ax1.axis([0, EPOCHS, 0.18, 0.4])
 
 # Stelle den MAE für beide Datensätze dar
 ax2.plot(epochs, mae, "b-", label="Training")
 ax2.plot(epochs, val_mae, "g-", label="Validation")
-ax2.grid()
-ax2.set_xlabel("Epochen")
-ax2.set_ylabel("$MAE$", labelpad=12)
-ax2.axis([0, EPOCHS, 0.35, 0.45])
+
+[...] # Achsenbeschriftung, Gitter und Legende
 
 plt.show()
 \end{pythoncode}
-\newpage
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\plotw]{first-nn/1-metrics.pdf}
@@ -633,8 +619,8 @@ Die grafische Darstellung der Prognosen bestätigt dieses Ergebnis:
 Das Netz scheint die Daten trotz Rauschen gut beschreiben zu können.
 Die Kurve ist nicht vollständig glatt, was eine leichte Überanpassung der Trainingsdaten
 indiziert. Möchte das Modell weiter verbessert werden,
-könnte das Training regularisiert
-oder mehr Trainingsdaten gesammelt werden
+könnte das Training regularisiert,
+mehr Trainingsdaten gesammelt oder Rauschen beseitigt werden
 (vgl. Verhinderung von Überanpassung, \cite[28]{book:hands-on-ml}).
 Ist die Leistung des Modells am \textit{validation set} zufriedenstellend,
 kann in den letzten Schritt übergegangen werden: Die Evaluierung am \textit{test set}.
@@ -644,14 +630,15 @@ Keras bietet hierfür die Methode \pythoninline{evaluate} an:
 19/19 [======] - 0s 2ms/step - loss: 0.0706 - mae: 0.2078
 [0.07061798125505447, 0.20783697068691254]
 \end{pyconcode}
-Sowohl die Werte des $MSE$ als auch die des $MAE$ sind sehr ähnlich
+Sowohl die Werte des $MSE$ (\num{0.0706} zu \num{0.0646}) als auch
+die des $MAE$ (\num{0.2078} zu \num{0.2027}) sind sehr ähnlich
 wie die aus dem Training. Das Netz schafft es also auch für
 bislang ungesehene Daten gute Schlüsse ziehen.
 Es ist wichtig, der Versuchung zu widerstehen, das Modell nach
 der Evaluierung am \textit{test set} weiter anzupassen, da die Abschätzung
 des Generalisierungsfehlers ansonsten zu optimistisch wäre
 \parencite[80]{book:hands-on-ml}.
-Für eine letzte Bestätigung können auch die Vorhersagen
+Für eine endgültige Bestätigung können auch die Vorhersagen
 der Testdaten ein letztes Mal grafisch dargestellt werden:
 \begin{pythoncode}
 predictions = model.predict(x_test)
@@ -665,3 +652,69 @@ predictions = model.predict(x_test)
 \end{figure}
 
 \section{Konvertierung des Modells nach TensorFlow Lite}
+Jetzt, wo ein Modell mit der gewünschten Qualität trainiert
+wurde, ist es Zeit, dieses zu veröffentlichen.
+Das Modell soll für die Verwendung auf mobilen Geräten optimiert werden
+und kompatibel mit Google Edge TPUs sein.
+Hierfür wird Gebrauch von der TensorFlow Lite (TFLite) Bibliothek gemacht.
+Wie in \autoref{sec:dl-mobile} untersucht,
+besteht das Hauptziel der Konvertierung darin, die Modellgröße zu verringern
+für schnellere Inferenz, kürzere Downloadzeiten und geringere RAM Nutzung.
+Zuerst wird das normale Keras Modell gespeichert:
+\begin{pythoncode}
+model.save("sine_model.h5")
+\end{pythoncode}
+Keras verwendet das HDF5 Dateiformat
+indem alle Informationen über das gespeicherte Modell enthalten sind,
+inklusive der trainierten Gewichte und Bias-Werte und alle eingestellten
+Parameter \parencite[314]{book:hands-on-ml}.
+Anders als bei TensorFlow Lite werden durch Keras keine Optimierungsschritte
+durchgeführt.
+TFLite setzt eine speziell für Speicherplatz und Geschwindigkeit
+optimierte Architektur ein,
+die sich \textit{FlatBuffers} nennt.
+\textit{FlatBuffers} sind eine von Google
+entwickelte Technologie, ursprünglich entworfen für die Spieleentwicklung
+und anderen leistungskritischen Anwendungen.
+\textit{FlatBuffers} können ohne Vorverarbeitung direkt in den RAM
+geladen, dies verringert die Ladezeit
+und minimiert den Speicherfußabdruck \parencite[685]{book:hands-on-ml}.
+Um ein Keras Modell als \textit{FlatBuffer} zu speichern, kann die
+\pythoninline{tf.lite.TFLiteConverter} Klasse verwendet werden:
+\begin{pythoncode}
+# Konvertierung von einem Keras Modell
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert() # Gibt FlatBuffer Bytes zurück
+
+def save_model(model, model_name):
+    with open(model_name, "wb") as f:
+        f.write(model)
+
+# Schreibe die binären Daten in eine Datei
+save_model(tflite_model, "sine_model.tflite")
+\end{pythoncode}
+Ein Vergleich der Modelldateigrößen zeigt bereits einen riesigen Unterschied:
+\begin{pyconcode}
+>>> import os
+>>> sine_original_size = os.path.getsize("sine_model.h5")
+>>> print(f"Ursprüngliche Größe: {sine_original_size} bytes")
+Ursprüngliche Größe: 25480 bytes
+>>> sine_lite_size = os.path.getsize("sine_model.tflite")
+>>> print(f"TFLite Größe: {sine_lite_size} bytes")
+TFLite Größe: 4856 bytes
+>>> print(f"Differenz: {sine_original_size - sine_lite_size} bytes")
+Differenz: 20624 bytes
+\end{pyconcode}
+Das TFLite Modell ist bereits um einiges kleiner als die ursprüngliche Datei,
+kann aber noch nicht zusammen mit der Edge TPU verwendet werden.
+Bei der vorherigen Betrachtung der Gewichte des ersten Modells
+in \autoref{sec:train-evaluate-model}, haben wir gesehen, das
+diese als \qty{32}{\bit} Gleitkommazahlen dargestellt werden.
+Eine weitere Methode, um die Größe eines Modells zu verringern,
+ist es, diese Bitbreite zu verkürzen.
+Werden beispielsweise \qty{16}{\bit} Gleitkommazahlen verwendet,
+kann die Größe des Modells noch einmal halbiert werden.
+TensorFlow Lite kann allerdings noch weiter gehen, als dass, indem es die
+Bitbreite hinunter bis auf 8-bit-Ganzzahlen abbildet.
+Dieser Prozess nennt sich Quantisierung
+(engl. \textit{quantization}) und führt zu einer vierfachen Verkleinerung.
