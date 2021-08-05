@@ -651,7 +651,7 @@ predictions = model.predict(x_test)
   \textit{test set} zusammen mit der Sinuskurve als Referenz}
 \end{figure}
 
-\section{Konvertierung des Modells nach TensorFlow Lite}
+\section{Konvertieren des Modells nach TensorFlow Lite}
 Jetzt, wo ein Modell mit der gewünschten Qualität trainiert
 wurde, ist es Zeit, dieses zu veröffentlichen.
 Das Modell soll für die Verwendung auf mobilen Geräten optimiert werden
@@ -693,7 +693,7 @@ def save_model(model, model_name):
 # Schreibe die binären Daten in eine Datei
 save_model(tflite_model, "sine_model.tflite")
 \end{pythoncode}
-Ein Vergleich der Modelldateigrößen zeigt bereits einen riesigen Unterschied:
+Ein Vergleich der Modellgrößen zeigt schon jetzt einen riesigen Unterschied:
 \begin{pyconcode}
 >>> import os
 >>> sine_original_size = os.path.getsize("sine_model.h5")
@@ -705,7 +705,7 @@ TFLite Größe: 4856 bytes
 >>> print(f"Differenz: {sine_original_size - sine_lite_size} bytes")
 Differenz: 20624 bytes
 \end{pyconcode}
-Das TFLite Modell ist bereits um einiges kleiner als die ursprüngliche Datei,
+Das TFLite Modell ist um einiges kleiner als die ursprüngliche Datei,
 kann aber noch nicht zusammen mit der Edge TPU verwendet werden.
 Bei der vorherigen Betrachtung der Gewichte des ersten Modells
 in \autoref{sec:train-evaluate-model}, haben wir gesehen, das
@@ -718,3 +718,6 @@ TensorFlow Lite kann allerdings noch weiter gehen, als dass, indem es die
 Bitbreite hinunter bis auf 8-bit-Ganzzahlen abbildet.
 Dieser Prozess nennt sich Quantisierung
 (engl. \textit{quantization}) und führt zu einer vierfachen Verkleinerung.
+Für die Verwendung mit Edge TPUs ist dieser Schritt nicht optional,
+da sie speziell danach ausgerichtet sind,
+mit ganzen Zahlen zu rechnen \parencite{online:models-on-edge-tpu}.
