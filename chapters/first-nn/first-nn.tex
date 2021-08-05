@@ -649,6 +649,7 @@ predictions = model.predict(x_test)
   \includegraphics[width=\plotw]{first-nn/2-predictions.pdf}
   \caption{Ein Graph der Prognosen des verbesserten Modells gegenüber der Sollwerte aus dem
   \textit{test set} zusammen mit der Sinuskurve als Referenz}
+  \label{fig:predictions-train-set}
 \end{figure}
 
 \section{Konvertieren des Modells nach TensorFlow Lite}
@@ -721,3 +722,159 @@ Dieser Prozess nennt sich Quantisierung
 Für die Verwendung mit Edge TPUs ist dieser Schritt nicht optional,
 da sie speziell danach ausgerichtet sind,
 mit ganzen Zahlen zu rechnen \parencite{online:models-on-edge-tpu}.
+Quantisierung kann auf zwei Weisen durchgeführt werden:
+Während dem Training (\textit{Quantization aware training})
+und nach dem Training (\textit{Post-training quantization}).
+Die Quantisierungsschritte sind für beide Möglichkeiten ähnlich,
+\textit{Post-training quantization} benötigt jedoch etwas weniger Vorbereitung,
+weshalb es hier gezeigt wird.
+Quantisierung untersucht alle Gewichte des Modells, um
+den größten absoluten Wert $m$ zu finden. Der Bereich $[-m,m]$
+wird anschließend auf die feste Länge $[-127,127]$
+abgebildet \parencite[686]{book:hands-on-ml}.
+Das Sinusmodell kann wie folgt quantisiert werden:
+\begin{pythoncode}
+# Konvertierung von einem Keras Modell
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+# Quantisiere alle festen Parameter (wie Gewichte und Bias-Werte)
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+
+# Ein repräsentativer Datensatz, damit neben den festen Parametern
+# auch die Aktivierungen quantisiert werden können
+# hierfür wird der Testdatensatz verwendet
+def representative_dataset():
+    for value in x_test:
+        yield [value]
+
+# Benutze den repräsentativen Datensatz
+converter.representative_dataset = representative_dataset
+# Werfe einen Fehler wenn eine Operation nicht quantisiert werden kann
+converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
+# Auch Ein- und Ausgaben sollen Ganzzahlen sein
+converter.inference_input_type = tf.int8
+converter.inference_output_type = tf.int8
+
+# Konvertiere das Modell nach FlatBuffer
+tflite_model = converter.convert()
+
+# Speichere die binären Daten
+save_model(tflite_model, "sine_model_quant.tflite")
+\end{pythoncode}
+Damit neben den Gewichten und Bias-Werten auch die Aktivierungen
+quantisiert werden können, wird ein repräsentativer Datensatz benötigt.
+Dieser Schritt ist nur relevant für \textit{Post-training quantization}.
+Die Modellgröße des normalen und quantisierten Modells kann
+erneut verglichen werden:
+\begin{pyconcode}
+>>> sine_lite_size = os.path.getsize("sine_model.tflite")
+>>> print(f"TFLite Größe: {sine_lite_size} bytes")
+TFLite Größe: 4856 bytes
+>>> sine_lite_quant_size = os.path.getsize("sine_model_quant.tflite")
+>>> print(f"TFLite + Quantisierung Größe: {sine_lite_quant_size} bytes")
+TFLite + Quantisierung Größe: 3280 bytes
+>>> print(f"Differenz: {sine_lite_size - sine_lite_quant_size} bytes")
+Differenz: 1576 bytes
+\end{pyconcode}
+Die Größe wurde ein weiteres Mal reduziert, eine
+vierfache Verkleinerung konnte jedoch nicht erreicht werden.
+Dies hat den Grund, da das Netz von vornherein bereits
+sehr klein ist und Gewichte und Bias-Werte neben anderen
+Informationen wie dem Berechnugsgraph nur einen kleinen
+Teil der Gesamtgröße ausmachen \parencite[64]{book:tiny-ml}.
+Für größere Modelle würde eine vierfache Verkleinerung
+festgestellt werden. Das Netz ist nun vollständig
+quantisiert und kann somit restlos auf der Edge TPU
+ausgeführt werden. Davor muss das Modell aber noch kompiliert werden, dies
+geht mithilfe des \consoleinline{edgetpu_compiler}:
+\begin{consolecode}
+$ edgetpu_compiler --min_runtime_version 13 sine_model_quant.tflite
+Edge TPU Compiler version 16.0.384591198
+Started a compilation timeout timer of 180 seconds.
+
+Model compiled successfully in 43 ms.
+
+Input model: sine_model_quant.tflite
+Input size: 3.20KiB
+Output model: sine_model_quant_edgetpu.tflite
+Output size: 36.56KiB
+On-chip memory used for caching model parameters: 4.75KiB
+On-chip memory remaining for caching model parameters: 7.74MiB
+Off-chip memory used for streaming uncached model parameters: 0.00B
+Number of Edge TPU subgraphs: 1
+Total number of operations: 4
+Operation log: sine_model_quant_edgetpu.log
+See the operation log file for individual operation details.
+Compilation child process completed within timeout period.
+Compilation succeeded!
+\end{consolecode}
+Das Projektverzeichnis enthält nun vier Modelldateien und eine Log-Datei:
+\begin{consolecode}
+$ ls | cat
+[...]
+sine_model.h5
+sine_model.tflite
+sine_model_quant.tflite
+sine_model_quant_edgetpu.log
+sine_model_quant_edgetpu.tflite
+\end{consolecode}
+Die Log-Datei birgt weitere nützliche Informationen:
+\begin{consolecode}
+$ cat sine_model_quant_edgetpu.log
+Edge TPU Compiler version 16.0.384591198
+Input: sine_model_quant.tflite
+Output: sine_model_quant_edgetpu.tflite
+
+Operator                       Count      Status
+
+FULLY_CONNECTED                4          Mapped to Edge TPU
+\end{consolecode}
+Die Ausgabe bestätigt, dass alle vier Schichten des Netzes
+(drei verborgene und eine Ausgabeschicht)
+auf der Edge TPU ausgeführt werden.
+
+\section{Die Modelle verwenden}
+Die soeben erstellten Modelle können nun verwendet werden, um
+Vorhersagen zu machen.
+Da die Fokussierung von TensorFlow Lite auf Geschwindigkeit
+liegt, umfasst dieser Vorgang im Vergleich zu Keras einige
+zusätzliche Schritte. Der folgende Programmausschnitt
+wird das unquantisierte und für die Edpe TPU
+kompilierte TFLite Modell verwenden, um über dem Testdatensatz Inferenzen
+durchzuführen. Die Ergebnisse können dann mit den Prognosen
+aus \autoref{fig:predictions-train-set} verglichen werden,
+um festzustellen, ob durch die Quantisierung bemerkbare
+Genauigkeitsverluste entstanden sind.
+Anstatt wie in Keras einfach die \pythoninline{predict}
+Methode aufzurufen, müssen in TFLite die folgenden
+Schritte durchgeführt werden:
+\begin{enumerate}
+  \item Instanziiere ein \pythoninline{Interpreter} Objekt.
+  \item Rufe eine Methode auf, um dem
+        \textit{FlatBuffer} Arbeitsspeicher zu zuweisen.
+  \item Schreibe die Netzeingaben in den Eingabetensor.
+  \item Rufe das Modell auf.
+  \item Lese die Netzausgaben aus dem Ausgabetensor.
+\end{enumerate}
+\begin{pythoncode}
+import platform
+
+# Plattformspezifische Bibliotheken für die Edge TPU
+EDGETUP_LIB = {
+    "Linux": "libedgetpu.so.1",
+    "Darwin": "libedgetpu.1.dylib",
+    "Windows": "edgetpu.dll",
+}[platform.system()]
+
+delegates = [tf.lite.experimental.load_delegate(EDGETUP_LIB)]
+
+# 1. Instanziiere die Interpreter
+sine_model_cpu = tf.lite.Interpreter("sine_model.tflite")
+sine_model_tpu = tf.lite.Interpreter(
+    "sine_model_quant_edgetpu.tflite",
+    experimental_delegates=delegates
+)
+
+# 2. Weise den Arbeitsspeicher zu
+sine_model_cpu.allocate_tensors()
+sine_model_tpu.allocate_tensors()
+\end{pythoncode}
