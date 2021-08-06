@@ -13,6 +13,7 @@
 \usepackage{xparse}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{siunitx}
+\usepackage{booktabs}
 
 \usepackage{enumitem}
 \setlist{itemsep=0pt}
@@ -51,10 +52,12 @@
 \include{pages/abstract.tex}
 \tableofcontents
 \listoffigures
+\listoftables
 \newpage
 \pagenumbering{arabic}
 \include{chapters/einleitung/einleitung.tex}
 \include{chapters/first-nn/first-nn.tex}
+\include{chapters/application/application.tex}
 \printbibliography[title = Literaturverzeichnis]
 \addcontentsline{toc}{chapter}{Literaturverzeichnis}
 \appendix

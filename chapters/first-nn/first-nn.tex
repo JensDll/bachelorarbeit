@@ -653,6 +653,7 @@ predictions = model.predict(x_test)
 \end{figure}
 
 \section{Konvertieren des Modells nach TensorFlow Lite}
+\label{sec:convert-model}
 Jetzt, wo ein Modell mit der gewünschten Qualität trainiert
 wurde, ist es Zeit, dieses zu veröffentlichen.
 Das Modell soll für die Verwendung auf mobilen Geräten optimiert werden
@@ -732,6 +733,16 @@ Quantisierung untersucht alle Gewichte des Modells, um
 den größten absoluten Wert $m$ zu finden. Der Bereich $[-m,m]$
 wird anschließend auf die feste Länge $[-127,127]$
 abgebildet \parencite[686]{book:hands-on-ml}.
+Eine 8-bit-Ganzzahl wird durch die folgende Gleichung ap­pro­xi­mie­rt \parencite{DBLP:quantization}:
+\begin{equation}
+  r = S(q - Z)
+  \label{eq:quant}
+\end{equation}
+Die Konstanten $S$ und $Z$ sind die Quantisierungsparameter.
+$S$ ist die Skalierung (engl. für \textit{scale}),
+$Z$ ist der Nullpunkt (engl. für \textit{zero point}),
+$r$ ist die reale Gleitkommazahl und $q$ ist der quantisierte Wert
+(in diesem Fall eine 8-bit-Ganzzahl).
 Das Sinusmodell kann wie folgt quantisiert werden:
 \begin{pythoncode}
 # Konvertierung von einem Keras Modell
@@ -741,7 +752,7 @@ converter.optimizations = [tf.lite.Optimize.DEFAULT]
 
 # Ein repräsentativer Datensatz, damit neben den festen Parametern
 # auch die Aktivierungen quantisiert werden können
-# hierfür wird der Testdatensatz verwendet
+# hierfür werden die Testdaten verwendet
 def representative_dataset():
     for value in x_test:
         yield [value]
@@ -849,8 +860,8 @@ Methode aufzurufen, müssen in TFLite die folgenden
 Schritte durchgeführt werden:
 \begin{enumerate}
   \item Instanziiere ein \pythoninline{Interpreter} Objekt.
-  \item Rufe eine Methode auf, um dem
-        \textit{FlatBuffer} Arbeitsspeicher zu zuweisen.
+  \item Rufe eine Methode auf, um den
+        \textit{FlatBuffer} in den Arbeitsspeicher zu laden.
   \item Schreibe die Netzeingaben in den Eingabetensor.
   \item Rufe das Modell auf.
   \item Lese die Netzausgaben aus dem Ausgabetensor.
@@ -865,16 +876,304 @@ EDGETUP_LIB = {
     "Windows": "edgetpu.dll",
 }[platform.system()]
 
-delegates = [tf.lite.experimental.load_delegate(EDGETUP_LIB)]
-
 # 1. Instanziiere die Interpreter
+# Dieses Modell wird auf der CPU ausgeführt
 sine_model_cpu = tf.lite.Interpreter("sine_model.tflite")
+# Dieses Modell wird auf der Edge TPU ausgeführt
 sine_model_tpu = tf.lite.Interpreter(
     "sine_model_quant_edgetpu.tflite",
-    experimental_delegates=delegates
+    experimental_delegates=[tf.lite.experimental.load_delegate(EDGETUP_LIB)]
 )
-
+\end{pythoncode}
+Jedes Modell besitzt eine Liste von Eingabe- und Ausgabedetails
+mit Informationen für jede Ein- und Ausgabeschicht des neuronalen Netzes.
+Die folgende Ausgabe ist gekürzt und zeigt nur die wichtigsten Werte:
+\begin{pyconcode}
+>>> sine_model_tpu.get_input_details()
+[{"index": 0,
+  "shape": array([1, 1]),
+  "dtype": numpy.int8,
+  "quantization": (0.024590179324150085, -128)}]
+>>> sine_model_tpu.get_output_details()
+[{"index": 1,
+  "shape": array([1, 1]),
+  "dtype": numpy.int8,
+  "quantization": (0.008226378820836544, -2)}]
+>>> # Das CPU-Modell hat einen anderen Datentyp und keine Quantisierung
+>>> sine_model_cpu.get_input_details()
+[{"index": 0,
+  "shape": array([1, 1]),
+  "dtype": numpy.float32,
+  "quantization": (0.0, 0)}]
+>>> sine_model_cpu.get_output_details()
+[{"index": 12,
+  "shape": array([1, 1]),
+  "dtype": numpy.float32,
+  "quantization": (0.0, 0)}]
+>>> # Weitere Attribute (dieselben wie für die Eingabedetails)
+>>> sine_model_tpu.get_output_details()[0].keys()
+dict_keys(["name", "index", "shape", "shape_signature", "dtype",
+           "quantization", "quantization_parameters", "sparsity_parameters"])
+\end{pyconcode}
+Diese Informationen können nun verwendet werden, um die
+restlichen Schritte durchzuführen:
+\begin{pythoncode*}{escapeinside=||}
 # 2. Weise den Arbeitsspeicher zu
 sine_model_cpu.allocate_tensors()
 sine_model_tpu.allocate_tensors()
+
+input_details_cpu = sine_model_cpu.get_input_details()[0]
+input_details_tpu = sine_model_tpu.get_input_details()[0]
+
+output_details_cpu = sine_model_cpu.get_output_details()[0]
+output_details_tpu = sine_model_tpu.get_output_details()[0]
+
+# Vergleiche |\autoref{eq:quant}|
+input_scale, input_zero_point = input_details_tpu["quantization"]
+output_scale, output_zero_point = output_details_tpu["quantization"]
+
+input_index_cpu = input_details_cpu["index"]
+input_index_tpu = input_details_tpu["index"]
+
+output_index_cpu = output_details_cpu["index"]
+output_index_tpu = output_details_tpu["index"]
+
+sine_model_cpu_predictions = []
+sine_model_tpu_predictions = []
+
+for value in x_test:
+    float32_tensor = tf.expand_dims(value, axis=0)
+    # Berechne den quantisierten Wert
+    # |$q = (r / S) + Z$ \eqref{eq:quant}|
+    int8_tensor = (value / input_scale) + input_zero_point
+    int8_tensor = tf.cast(int8_tensor, dtype=tf.int8)
+    int8_tensor = tf.expand_dims(int8_tensor, axis=0)
+    
+    # 3. Schreibe die Netzeingaben in den Eingabetensor
+    sine_model_cpu.set_tensor(input_index_cpu, float32_tensor)
+    sine_model_tpu.set_tensor(input_index_tpu, int8_tensor)
+
+    # 4. Rufe das Modell auf
+    sine_model_cpu.invoke()
+    sine_model_tpu.invoke()
+    
+    # 5. Lese die Netzausgaben aus dem Ausgabetensor
+    output = sine_model_cpu.get_tensor(output_index_cpu)[0,0]
+    sine_model_cpu_predictions.append(output)
+    output = sine_model_tpu.get_tensor(output_index_tpu)[0,0]
+    # Berechne den realen Wert
+    # |$r = S(q - Z)$ \eqref{eq:quant}|
+    output = output_scale * (output - output_zero_point) 
+    sine_model_tpu_predictions.append(output)
+\end{pythoncode*}
+Nachdem das obere Programm ausgeführt wurde, können die Ergebnisse
+mit den ursprünglichen Prognosen aus \autoref{fig:predictions-train-set}
+verglichen werden:
+\begin{pythoncode}
+plt.plot(x_test, y_test, "b.", label="Testdaten")
+plt.plot(x_test, predictions_2, "ro", label="Ursprüngliche Prognose")
+plt.plot(x_test, sine_model_cpu_predictions, "yx", label="Lite Prognose")
+plt.plot(x_test, sine_model_tpu_predictions, "g+", label="Edge TPU Prognose")
+plt.legend()
+plt.show()
 \end{pythoncode}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\plotw]{first-nn/model-comparison.pdf}
+  \caption{Ein Vergleich der Inferenzergebnisse des Keras-Modells, dem unquantisierten
+  TFLite-Modell und dem quantisierten Edge-TPU-Modell}
+  \label{fig:predictions-train-set}
+\end{figure}
+Es ist zu sehen, dass durch die Quantisierung keine oder nur kaum
+zu bemerkende Genauigkeitsverluste entstanden sind.
+
+
+\section{Ein Vergleich der Inferenzgeschwindigkeiten}
+\label{appx:benchmarking}
+Die Inferenzgeschwindigkeiten der verschiedenen TFLite-Modelle
+sollen nun verglichen werden. Hierfür kann das folgende Python-Programm
+ausgeführt werden.
+Das Gerät benötigt eine funktionierende Edge TPU
+und das Python-Skript muss Zugriff auf
+das \pythoninline{tflite_runtime} Paket haben.
+Die Installation ist je nach Plattform eine unterschiedliche
+(siehe hierfür die Coral AI und TensorFlow Dokumentation).
+\begin{pythoncode}
+import time
+import tflite_runtime.interpreter as tflite
+import platform
+import numpy as np
+
+EDGETUP_LIB = {
+    "Linux": "libedgetpu.so.1",
+    "Darwin": "libedgetpu.1.dylib",
+    "Windows": "edgetpu.dll",
+}[platform.system()]
+
+# Die drei zu vergleichenden Modelle
+sine_model_cpu = tflite.Interpreter("sine_model.tflite")
+sine_model_quant_cpu = tflite.Interpreter("sine_model_quant.tflite")
+sine_model_tpu = tflite.Interpreter(
+    "sine_model_quant_edgetpu.tflite",
+    experimental_delegates=[tflite.load_delegate(EDGETUP_LIB)],
+)
+
+sine_model_cpu.allocate_tensors()
+sine_model_quant_cpu.allocate_tensors()
+sine_model_tpu.allocate_tensors()
+
+rng = np.random.default_rng(42)
+
+def measure_performance(model):
+    input_details = model.get_input_details()[0]
+    input_index = input_details["index"]
+    input_shape = input_details["shape"]
+    dtype = input_details["dtype"]
+
+    # 20000 Testdaten im Bereich null bis sechs
+    test_data = rng.random(size=[20000, *input_shape], dtype=np.float32) * 6
+
+    if dtype == np.int8:
+        # Skaliere die Eingaben für quantisierte Modelle
+        input_scale, input_zero_point = input_details["quantization"]
+        test_data = test_data / input_scale + input_zero_point
+        test_data = test_data.astype(dtype)
+
+    result = 0
+    for i, value in enumerate(test_data):
+        model.set_tensor(input_index, value)
+        # Messe die Zeit in Millisekunden
+        start = time.perf_counter()
+        model.invoke()
+        inference_time = (time.perf_counter() - start) * 1000
+        # Überspringe die ersten Messungenn,
+        # um den Modellen Zeit zu gegeben, vom Cache Gebrauch zu machen
+        if i > 10:
+            result += inference_time
+    return result
+
+result = measure_performance(sine_model_cpu)
+print(f"CPU Inferenzgeschwindigkeit: {result:.4f} ms")
+result = measure_performance(sine_model_quant_cpu)
+print(f"CPU quantisierte Inferenzgeschwindigkeit: {result:.4f} ms")
+result = measure_performance(sine_model_tpu)
+print(f"TPU Inferenzgeschwindigkeit: {result:.4f} ms")
+\end{pythoncode}
+Die folgenden Befehle zeigen wie der obere Benchmark durchgeführt werden kann.
+In diesem Beispiel wurde der Test auf dem Siemens SIMATIC IOT2050 \eqref{fig:iot2050}
+ausgeführt:
+\begin{consolecode}
+$ mkdir benchmark
+$ cd benchmark
+$ python3 -m venv --system-site-packages env
+$ source env/bin/activate
+$ pip install -U pip
+$ pip install --ignore-installed numpy
+$ wget "https://raw.githubusercontent.com/JensDll\
+> /bachelorarbeit-notebooks/1.0.5/first-nn/benchmark/download.sh"
+$ # Führe das heruntergeladene Bash-Skript aus um die Modelle herunterzuladen
+$ bash download.sh 1.0.5
+$ cd models
+$ python sine_benchmark.py
+CPU Inferenzgeschwindigkeit: 492.3875 ms
+CPU quantisierte Inferenzgeschwindigkeit: 452.9881 ms
+TPU Inferenzgeschwindigkeit: 4490.2631 ms
+\end{consolecode}
+Die Zeiten zeigen ein überraschendes Ergebnis.
+Das Modell, welches auf der Edge TPU ausgeführt wird, scheint um einiges
+langsamer zu sein als die, welche auf der CPU ausgeführt werden.
+Um zu bestätigen, dass die Edge TPU korrekt arbeitet,
+können wir einen weiteren Test durchführen,
+aber dieses Mal mit einem Modell, welches bereits
+getestet gute Inferenzgeschwindigkeit besitzt. Wir
+verwenden das in \autoref{fig:ui-classification-example}
+gezeigte Modell, um Insektenbilder zu unterscheiden:
+\begin{pythoncode}
+import time
+import tflite_runtime.interpreter as tflite
+import platform
+import numpy as np
+
+EDGETUP_LIB = {
+    "Linux": "libedgetpu.so.1",
+    "Darwin": "libedgetpu.1.dylib",
+    "Windows": "edgetpu.dll",
+}[platform.system()]
+
+# Die zu vergleichenden Modelle
+insect_model_cpu = tflite.Interpreter("mobilenet_v2_1.0_224_inat_insect_quant.tflite")
+insect_model_tpu = tflite.Interpreter(
+    "mobilenet_v2_1.0_224_inat_insect_quant_edgetpu.tflite",
+    experimental_delegates=[tflite.load_delegate(EDGETUP_LIB)],
+)
+
+insect_model_cpu.allocate_tensors()
+insect_model_tpu.allocate_tensors()
+
+rng = np.random.default_rng(42)
+
+def measure_performance(model):
+    input_details = model.get_input_details()[0]
+    input_index = input_details["index"]
+    input_shape = input_details["shape"][1:]
+
+    # Zufälliges Testbild
+    test_data = rng.integers(low=0, high=256, size=[1, *input_shape], dtype=np.uint8)
+
+    result = 0
+    for i in range(12):
+        model.set_tensor(input_index, test_data)
+        # Messe die Zeit in Millisekunden
+        start = time.perf_counter()
+        model.invoke()
+        inference_time = (time.perf_counter() - start) * 1000
+        # Überspringe die ersten zwei Messungen
+        if i > 1:
+            result += inference_time
+    return result
+
+result = measure_performance(insect_model_cpu)
+print(f"CPU Inferenzgeschwindigkeit: {result:.4f} ms")
+result = measure_performance(insect_model_tpu)
+print(f"TPU Inferenzgeschwindigkeit: {result:.4f} ms")
+\end{pythoncode}
+Wurden die vorigen Befehle ausgeführt, kann auch dieser Test einfach durchgeführt
+werden:
+\begin{consolecode}
+$ python mobilenet_benchmark.py
+CPU Inferenzgeschwindigkeit: 2025.3505 ms
+TPU Inferenzgeschwindigkeit: 27.4516 ms
+\end{consolecode}
+Die Edge TPU zeigt ein deutlich besseres Ergebnis.
+Der Gründe für die langsamere Geschwindigkeit im ersten Test
+sind unklar. Es gibt Diskussionen auf dem Google Coral
+GitHub Repository (wie
+\href{https://github.com/google-coral/edgetpu/issues/89}{\#89}), in denen
+ähnliche Ergebnisse gezeigt werden.
+Die Edge TPU scheint für Netze mit vielen vollständig verbundenen Schichten
+langsamer zu sein als die Ausführung desselben Netzes auf der CPU.
+Wird die TPU hingegen für andere Netzarchitekturen
+eingesetzt (wie, dem \textit{Convolutional Neural Network} für Computervision
+im zweiten Test), führt dies zu einer wesentlich besseren Leistung.
+Ein entwickeltes Modell sollte also immer zusammen
+mit der verwendeten Hardware getestet werden, um die
+Leistungsverbesserungen abzuschätzen und das mit der besten Geschwindigkeit auszuwählen.
+Werden die oben zu sehenden Benchmarks vier weitere Male durchgeführt, ergeben sich
+Inferenzgeschwindigkeiten wie in \autoref{tab:benchmark-results}
+zu sehen sind.
+\begin{table}[h!]
+  \centering
+  \caption{Ein Vergleich der Inferenzgeschwindigkeiten, nachdem die
+  Benchmarks viermal hintereinander durchgeführt wurden}
+  \label{tab:benchmark-results}
+  \begin{tabular}{lSSSS}
+    \toprule
+                          & \multicolumn{4}{c}{Durchlauf (\unit{\milli\second})} \\ \cmidrule(){2-5}
+    Modell                & 1         & 2         & 3         & 4                \\ \midrule
+    Sinus CPU             & 490.9770  & 494.2958  & 500.0013  & 499.6144         \\
+    Sinus quantisiert CPU & 448.8091  & 458.9007  & 456.8160  & 453.6806         \\
+    Sinus Edge TPU        & 3958.7869 & 4466.2854 & 4329.7590 & 4392.6025        \\ \midrule
+    MobileNet V2 CPU      & 2032.3503 & 2021.8814 & 2031.3118 & 2023.9531        \\
+    MobileNet V2 Edge TPU & 27.5456   & 27.4322   & 27.5093   & 27.6126          \\ \bottomrule
+  \end{tabular}
+\end{table}
