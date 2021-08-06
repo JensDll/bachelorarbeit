@@ -26,7 +26,8 @@
     "**/*.out": true,
     "**/*.run.xml": true,
     "**/*.synctex.gz": true,
-    "**/*.toc": true
+    "**/*.toc": true,
+    "**/*.lot": true
   },
   "latex-workshop.latex.tools": [
     {

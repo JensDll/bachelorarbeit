@@ -887,7 +887,7 @@ sine_model_tpu = tf.lite.Interpreter(
 \end{pythoncode}
 Jedes Modell besitzt eine Liste von Eingabe- und Ausgabedetails
 mit Informationen für jede Ein- und Ausgabeschicht des neuronalen Netzes.
-Die folgende Ausgabe ist gekürzt und zeigt nur die wichtigsten Werte:
+Die folgenden Ausgaben sind gekürzt und zeigen nur die wichtigsten Werte:
 \begin{pyconcode}
 >>> sine_model_tpu.get_input_details()
 [{"index": 0,
@@ -910,8 +910,8 @@ Die folgende Ausgabe ist gekürzt und zeigt nur die wichtigsten Werte:
   "shape": array([1, 1]),
   "dtype": numpy.float32,
   "quantization": (0.0, 0)}]
->>> # Weitere Attribute (dieselben wie für die Eingabedetails)
->>> sine_model_tpu.get_output_details()[0].keys()
+>>> # Weitere Attribute (dieselben wie für alle anderen Details)
+>>> sine_model_cpu.get_output_details()[0].keys()
 dict_keys(["name", "index", "shape", "shape_signature", "dtype",
            "quantization", "quantization_parameters", "sparsity_parameters"])
 \end{pyconcode}
@@ -989,7 +989,6 @@ zu bemerkende Genauigkeitsverluste entstanden sind.
 
 
 \section{Ein Vergleich der Inferenzgeschwindigkeiten}
-\label{appx:benchmarking}
 Die Inferenzgeschwindigkeiten der verschiedenen TFLite-Modelle
 sollen nun verglichen werden. Hierfür kann das folgende Python-Programm
 ausgeführt werden.
@@ -1083,7 +1082,7 @@ Die Zeiten zeigen ein überraschendes Ergebnis.
 Das Modell, welches auf der Edge TPU ausgeführt wird, scheint um einiges
 langsamer zu sein als die, welche auf der CPU ausgeführt werden.
 Um zu bestätigen, dass die Edge TPU korrekt arbeitet,
-können wir einen weiteren Test durchführen,
+können wir einen weiteren Benchmark durchführen,
 aber dieses Mal mit einem Modell, welches bereits
 getestet gute Inferenzgeschwindigkeit besitzt. Wir
 verwenden das in \autoref{fig:ui-classification-example}
@@ -1137,7 +1136,7 @@ print(f"CPU Inferenzgeschwindigkeit: {result:.4f} ms")
 result = measure_performance(insect_model_tpu)
 print(f"TPU Inferenzgeschwindigkeit: {result:.4f} ms")
 \end{pythoncode}
-Wurden die vorigen Befehle ausgeführt, kann auch dieser Test einfach durchgeführt
+Wurden die vorherigen Befehle ausgeführt, kann auch dieser Test einfach durchgeführt
 werden:
 \begin{consolecode}
 $ python mobilenet_benchmark.py
@@ -1145,7 +1144,7 @@ CPU Inferenzgeschwindigkeit: 2025.3505 ms
 TPU Inferenzgeschwindigkeit: 27.4516 ms
 \end{consolecode}
 Die Edge TPU zeigt ein deutlich besseres Ergebnis.
-Der Gründe für die langsamere Geschwindigkeit im ersten Test
+Der Gründe für die langsamere Geschwindigkeit im ersten Benchmark
 sind unklar. Es gibt Diskussionen auf dem Google Coral
 GitHub Repository (wie
 \href{https://github.com/google-coral/edgetpu/issues/89}{\#89}), in denen
@@ -1153,18 +1152,18 @@ GitHub Repository (wie
 Die Edge TPU scheint für Netze mit vielen vollständig verbundenen Schichten
 langsamer zu sein als die Ausführung desselben Netzes auf der CPU.
 Wird die TPU hingegen für andere Netzarchitekturen
-eingesetzt (wie, dem \textit{Convolutional Neural Network} für Computervision
+eingesetzt (wie, dem \textit{Convolutional Neural Network} für \textit{Computer Vision}
 im zweiten Test), führt dies zu einer wesentlich besseren Leistung.
 Ein entwickeltes Modell sollte also immer zusammen
 mit der verwendeten Hardware getestet werden, um die
 Leistungsverbesserungen abzuschätzen und das mit der besten Geschwindigkeit auszuwählen.
-Werden die oben zu sehenden Benchmarks vier weitere Male durchgeführt, ergeben sich
-Inferenzgeschwindigkeiten wie in \autoref{tab:benchmark-results}
+Werden die oben durchgeführt Benchmarks vier weitere Male ausgeführt, ergeben sich
+die Inferenzgeschwindigkeiten wie in \autoref{tab:benchmark-results}
 zu sehen sind.
 \begin{table}[h!]
   \centering
   \caption{Ein Vergleich der Inferenzgeschwindigkeiten, nachdem die
-  Benchmarks viermal hintereinander durchgeführt wurden}
+  gezeigten Benchmarks viermal hintereinander durchgeführt wurden}
   \label{tab:benchmark-results}
   \begin{tabular}{lSSSS}
     \toprule
