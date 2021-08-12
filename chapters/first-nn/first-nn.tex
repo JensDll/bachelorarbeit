@@ -37,9 +37,9 @@ das Beispiel soll jedoch zeigen,
 wie mit Deep Learning (und sehr kleinen Netzen)
 bereits anspruchsvollere, nicht lineare Daten gut modelliert werden können.
 Die Sinusfunktion ist in \autoref{plot:sine-curve} zu sehen.
-\begin{figure}[!h]
+\begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{first-nn/sine-curve.pdf}
+  \includegraphics[width=\wMD]{first-nn/sine-curve.pdf}
   \caption{Die Sinusfunktion}
   \label{plot:sine-curve}
 \end{figure}
@@ -77,8 +77,8 @@ y += 0.25 * tf.random.normal(y.shape)
 \end{pythoncode}
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{first-nn/sine-data-noise.pdf}
-  \caption{Die generierten Daten plus zufälliges Rauschen}
+  \includegraphics[width=\wMD]{first-nn/sine-data-noise.pdf}
+  \caption{Die generierten Sinusdaten plus zufälliges Rauschen}
 \end{figure}
 
 \section{Aufteilen der Trainingsdaten}
@@ -103,10 +103,10 @@ Im Training sollte der Algorithmus lediglich die Trainingsdaten
 zu Gesicht bekommen. Dies hilft bekannten
 Fehlerquellen wie der Überanpassung (dem Gegenstück zur Unteranpassung, engl.
 \textit{overfitting} und \textit{underfitting}) vorzubeugen.
-Die folgende Abbildung soll die beiden Begriffe deutlich machen.
+Die folgende Abbildung soll die beiden Begriffe deutlich machen:
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotbw]{first-nn/over_underfitting.pdf}
+  \includegraphics[width=\wLG]{first-nn/over_underfitting.pdf}
   \caption{Überanpassung und Unteranpassung am Beispiel einer
   quadratischen Funktion \parencite[131]{book:hands-on-ml}}
 \end{figure}
@@ -144,7 +144,7 @@ assert tf.size(x_train) + tf.size(x_test) + tf.size(x_val) == SAMPLES
 Die drei Datensätze können in der folgenden Abbildung farblich dargestellt werden:
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{first-nn/sine-data-noise-split.pdf}
+  \includegraphics[width=\wMD]{first-nn/sine-data-noise-split.pdf}
   \caption{Aufteilung der Sinusdaten in
   \textit{training}, \textit{validation} und \textit{test set}}
 \end{figure}
@@ -208,7 +208,7 @@ Intuitionen zu geben.\\[8pt]
 Kurzum \parencite[290-291]{book:hands-on-ml}:
 Backpropagation besteht aus zwei Phasen: einem Vorwärtsdurchlauf
 und einem Rückwärtsdurchlauf. Die Daten werden stapelweise verarbeitet
-(\zB 32 Datensätze auf ein­mal) und der gesamte Trainingsdatensatz
+(\zB{} 32 Datensätze auf ein­mal) und der gesamte Trainingsdatensatz
 wird mehrfach durchlaufen. Ein Trainingsdurchlauf nennt sich Epoche.\\[4pt]
 Jeder Datenstapel wird an die erste Schicht des neuronalen Netzes
 übergeben. Von dort wird im Vorwärtsdurchlauf die Aktivierung aller
@@ -275,7 +275,7 @@ model = keras.Model(inputs=input_layer, outputs=output_layer)
         zu sehen.
         \begin{figure}[h!]
           \centering
-          \includegraphics[width=\plotw]{first-nn/activation-functions.pdf}
+          \includegraphics[width=\wMD]{first-nn/activation-functions.pdf}
           \caption{Verschiedene Aktivierungsfunktionen \parencite[292]{book:hands-on-ml}}
           \label{activation-functions}
         \end{figure}
@@ -487,7 +487,7 @@ plt.show()
 \end{pythoncode}
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{first-nn/1-metrics.pdf}
+  \includegraphics[width=\wMD]{first-nn/1-metrics.pdf}
   \caption{Trainingskurven: Der durchschnittliche \textit{training}
   $MSE$ und $MAE$ gemessen während jeder Epoche
   und der \textit{validation} $MSE$ und $MAE$
@@ -524,7 +524,7 @@ plt.show()
 \end{pythoncode}
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{first-nn/1-predictions_val.pdf}
+  \includegraphics[width=\wMD]{first-nn/1-predictions_val.pdf}
   \caption{Ein Graph der Prognosen des Modells gegenüber der Sollwerte aus dem
   \textit{validation set} zusammen mit der Sinuskurve als Referenz}
   \label{fig:sine-underfitting}
@@ -599,7 +599,7 @@ Auch die Trainingskurven können nach demselben Prinzip
 generiert werden:
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{first-nn/2-metrics.pdf}
+  \includegraphics[width=\wMD]{first-nn/2-metrics.pdf}
   \caption{Trainingskurven des angepassten Modells}
 \end{figure}
 
@@ -610,7 +610,7 @@ sehen allgemein stabiler aus mit weniger großen Ausreißern.
 Die grafische Darstellung der Prognosen bestätigt dieses Ergebnis:
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{first-nn/2-predictions_val.pdf}
+  \includegraphics[width=\wMD]{first-nn/2-predictions_val.pdf}
   \caption{Ein Graph der Prognosen des verbesserten Modells gegenüber der Sollwerte aus dem
   \textit{validation set} zusammen mit der Sinuskurve als Referenz}
 \end{figure}
@@ -646,7 +646,7 @@ predictions = model.predict(x_test)
 \end{pythoncode}
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{first-nn/2-predictions.pdf}
+  \includegraphics[width=\wMD]{first-nn/2-predictions.pdf}
   \caption{Ein Graph der Prognosen des verbesserten Modells gegenüber der Sollwerte aus dem
   \textit{test set} zusammen mit der Sinuskurve als Referenz}
   \label{fig:predictions-train-set}
@@ -972,15 +972,15 @@ mit den ursprünglichen Prognosen aus \autoref{fig:predictions-train-set}
 verglichen werden:
 \begin{pythoncode}
 plt.plot(x_test, y_test, "b.", label="Testdaten")
-plt.plot(x_test, predictions_2, "ro", label="Ursprüngliche Prognose")
-plt.plot(x_test, sine_model_cpu_predictions, "yx", label="Lite Prognose")
+plt.plot(x_test, predictions_2, "ro", label="Keras Prognose")
+plt.plot(x_test, sine_model_cpu_predictions, "yx", label="Lite CPU Prognose")
 plt.plot(x_test, sine_model_tpu_predictions, "g+", label="Edge TPU Prognose")
 plt.legend()
 plt.show()
 \end{pythoncode}
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{first-nn/model-comparison.pdf}
+  \includegraphics[width=\wMD]{first-nn/model-comparison.pdf}
   \caption{Ein Vergleich der Inferenzergebnisse des Keras-Modells, dem unquantisierten
   TFLite-CPU-Modell und dem quantisierten Edge-TPU-Modell}
   \label{fig:predictions-train-set}

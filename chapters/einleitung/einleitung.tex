@@ -171,8 +171,8 @@ array([[4.64373629],
 Ein zweidimensionales Array mit nur einer Spalte nennt sich Spaltenvektor.
 Spaltenvektoren und Matrizen sind die typischen Darstellungsweisen
 für Daten im Maschinellen Lernen.
-Das Attribut \pythoninline{x.shape} gibt die Dimension des Arrays an, die nullte
-Dimension ist die Anzahl der Zeilen.
+Das Attribut \pythoninline{x.shape} gibt die Dimension des Datensatzes an, die nullte
+Dimension beschreibt die Anzahl der Zeilen, die zweite die Anzahl der Spalten usw.
 Operationen in NumPy werden immer elementweise durchgeführt:
 \begin{pyconcode}
 >>> a = np.array([1, 2, 3])
@@ -183,10 +183,10 @@ array([3, 6, 9])
 \end{pyconcode}
 CPUs und GPUs sind sehr gut darin, diese Art der Berechnungen durchzuführen,
 was NumPy sehr viel schneller macht als die Verwendung einer expliziten Schleife.
-Die Technik, nicht mehr nur mit skalaren Werten zu arbeiten,
+Die Technik, nicht mehr nur mit skalaren Werten zu rechnen,
 nennt sich Vektorisierung und kann
 die Laufzeit eines rechenintensiven Algorithmus
-(wie sie im ML zum Einsatz kommen) drastisch verringern.
+(wie sie in der KI zum Einsatz kommen) drastisch verringern.
 \begin{aquote}{\parencite{online:vectorization}}
   \enquote{\textit{Vectorization is the process of converting an algorithm
       from operating on a single value at a time to
@@ -205,9 +205,9 @@ plt.show()
 \end{pythoncode}
 \noindent
 Die hieraus resultierende Grafik ist in \autoref{plot:linear-data} zu sehen.
-\begin{figure}[!h]
+\begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{einleitung/linear-data.pdf}
+  \includegraphics[width=\wMD]{einleitung/linear-data.pdf}
   \caption{Die generierten Daten}
   \label{plot:linear-data}
 \end{figure}
@@ -221,9 +221,9 @@ y += 3 * rng.standard_normal((100, 1))
 Dies sollte das Problem ein wenig realistischer gestallten.
 Die so modifizierten Daten sind in \autoref{plot:linear-data-noise} zu sehen.
 \newpage
-\begin{figure}[!h]
+\begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{einleitung/linear-data-noise.pdf}
+  \includegraphics[width=\wMD]{einleitung/linear-data-noise.pdf}
   \caption{Die generierte Daten plus zufälliges Rauschen}
   \label{plot:linear-data-noise}
 \end{figure}
@@ -259,9 +259,9 @@ Nicht schlecht, das Modell vermutet $\yhat = 4.85 + 3.04x_1$, wobei die ursprün
 Funktion $y = 5 + 3x_1 + r$ war. Die genauen Werte konnten aufgrund des Rauschens
 nicht wiedergewonnen werden. Die Regressionsgerade ist
 in \autoref{plot:linear-data-prediction} zu sehen.
-\begin{figure}[!h]
+\begin{figure}[h!]
   \centering
-  \includegraphics[width=\plotw]{einleitung/linear-data-prediction.pdf}
+  \includegraphics[width=\wMD]{einleitung/linear-data-prediction.pdf}
   \caption{Regressionsgerade}
   \label{plot:linear-data-prediction}
 \end{figure}
@@ -308,7 +308,7 @@ Die folgenden Punkte begründen diese Vermutung \parencite[280]{book:hands-on-ml
         Geht das Training schnell, kann dieser Kreislauf öfter durchlaufen
         werden und es wird ein besseres Ergebnis erzielt.
   \item Von Spracherkennung bis hin zum autonomen Fahren,
-        es gibt bereits viele hervorragende Anwendungen, die zeigen,
+        es gibt bereits viele hervorragende Anwendungen, welche zeigen,
         wie gut Deep Learning funktioniert, um komplexe Probleme zu lösen.
 \end{itemize}
 Der Versuch, ein neuronales Netz von Beginn an neu aufzubauen,
@@ -376,8 +376,8 @@ Texas Instruments System-on-a-Chip zusammen mit einem ARM-64-Bit-Prozessor.
   \href{https://support.industry.siemens.com/cs/document/109779016/simatic-iot2050}{IOT2050}
   und der \href{https://coral.ai/docs/mini-pcie/datasheet/}{Google Coral Mini PCIe Karte}.}
 
-
 \section{Beschreibung des Problems}
+\label{sec:problem-description}
 Zu Beginn der Arbeit stellte sich der Autor die Frage:
 \enquote{Wie kann ein System entwickelt werden, mit dem verschiedene DL-Modelle
   verwaltet werden können, welches modular und einfach erweiterbar ist
@@ -399,7 +399,7 @@ sehen.
 Der in Gelb markierte Service ist eine Anwendung, welche
 lokal auf einem mobilen Gerät (wie dem IOT2050) ausgeführt wird.
 Es verwaltet ein veröffentlichtes Modell und führt mit diesem
-die Anfragen des Verbrauchers aus (\zB ob es sich bei einer E-Mail um Spam handelt).
+die Anfragen des Verbrauchers aus (\zB{} ob es sich bei einer E-Mail um Spam handelt).
 Verbraucher können ganz unterschiedliche Aufgaben und Ziele haben, sie müssen
 als einzige Einschränkung lediglich das verwendete Protokoll
 zur Servicekommunikation verstehen.
