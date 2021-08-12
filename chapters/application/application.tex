@@ -1,1 +1,22 @@
-\chapter{Die entwickelte Anwendung}
+\chapter{Eine Anwendung für mobiles Maschinelles Lernen}
+\label{chap:application}
+Es konnten bis hierher bereits einige Kenntnisse gewonnen
+werden. Wir haben die Grundlagen von Deep Learning untersucht
+und den Prozess beschrieben, wie mit TensorFlow und Keras
+ein neuronales Netz erstellt und trainiert werden kann.
+Das Modell wurde in ein mobil- und TPU-kompatibles Format umgewandelt
+und anschließend miteinander vergleichen.
+Hierbei konnte das Ergebnis festgehalten werden,
+dass zumindest bei kleinen Modellen und bestimmten Netzarchitekturen
+die Inferenzgeschwindigkeit
+auf der Edge TPU nicht unbedingt schneller ist als die gleiche
+Ausführung auf der CPU.
+Ein neuronales Netz allein, welches wunderbare Vorhersagen
+macht, reicht jedoch nicht, um ein nützliches Produkt zu entwickeln:
+Das Modell muss in einer Anwendung integriert werden, sodass
+der Benutzer oder andere Teile der Infrastruktur
+mit den Modellergebnissen interagieren können.
+Der Entwurf einer solchen Anwendung ist die
+Fokussierung dieses Kapitels.
+
+\section{Die allgemeine Architektur auslegen}

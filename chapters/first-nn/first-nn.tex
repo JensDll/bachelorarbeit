@@ -790,7 +790,7 @@ Die Größe wurde ein weiteres Mal reduziert, eine
 vierfache Verkleinerung konnte jedoch nicht erreicht werden.
 Dies hat den Grund, da das Netz von vornherein bereits
 sehr klein ist und Gewichte und Bias-Werte neben anderen
-Informationen wie dem Berechnugsgraph nur einen kleinen
+Informationen wie dem Berechnugsgraphen nur einen kleinen
 Teil der Gesamtgröße ausmachen \parencite[64]{book:tiny-ml}.
 Für größere Modelle würde eine vierfache Verkleinerung
 festgestellt werden. Das Netz ist nun vollständig
@@ -798,7 +798,7 @@ quantisiert und kann somit restlos auf der Edge TPU
 ausgeführt werden. Davor muss das Modell aber noch kompiliert werden, dies
 geht mithilfe des \consoleinline{edgetpu_compiler}:
 \begin{consolecode}
-$ edgetpu_compiler --min_runtime_version 13 sine_model_quant.tflite
+$ edgetpu_compiler sine_model_quant.tflite
 Edge TPU Compiler version 16.0.384591198
 Started a compilation timeout timer of 180 seconds.
 
@@ -889,6 +889,7 @@ Jedes Modell besitzt eine Liste von Eingabe- und Ausgabedetails
 mit Informationen für jede Ein- und Ausgabeschicht des neuronalen Netzes.
 Die folgenden Ausgaben sind gekürzt und zeigen nur die wichtigsten Werte:
 \begin{pyconcode}
+>>> # Das Edge-TPU-Modell mit ganzzahligen Ein- und Ausgaben und Quantisierung
 >>> sine_model_tpu.get_input_details()
 [{"index": 0,
   "shape": array([1, 1]),
@@ -899,7 +900,7 @@ Die folgenden Ausgaben sind gekürzt und zeigen nur die wichtigsten Werte:
   "shape": array([1, 1]),
   "dtype": numpy.int8,
   "quantization": (0.008226378820836544, -2)}]
->>> # Das CPU-Modell hat einen anderen Datentyp und keine Quantisierung
+>>> # Das CPU-Modell mit Gleitkommazahlen und keiner Quantisierung
 >>> sine_model_cpu.get_input_details()
 [{"index": 0,
   "shape": array([1, 1]),
@@ -910,7 +911,7 @@ Die folgenden Ausgaben sind gekürzt und zeigen nur die wichtigsten Werte:
   "shape": array([1, 1]),
   "dtype": numpy.float32,
   "quantization": (0.0, 0)}]
->>> # Weitere Attribute (dieselben wie für alle anderen Details)
+>>> # Weitere nicht gezeigte Attribute (dieselben wie für alle anderen Details)
 >>> sine_model_cpu.get_output_details()[0].keys()
 dict_keys(["name", "index", "shape", "shape_signature", "dtype",
            "quantization", "quantization_parameters", "sparsity_parameters"])
@@ -981,7 +982,7 @@ plt.show()
   \centering
   \includegraphics[width=\plotw]{first-nn/model-comparison.pdf}
   \caption{Ein Vergleich der Inferenzergebnisse des Keras-Modells, dem unquantisierten
-  TFLite-Modell und dem quantisierten Edge-TPU-Modell}
+  TFLite-CPU-Modell und dem quantisierten Edge-TPU-Modell}
   \label{fig:predictions-train-set}
 \end{figure}
 Es ist zu sehen, dass durch die Quantisierung keine oder nur kaum
@@ -1084,7 +1085,7 @@ langsamer zu sein als die, welche auf der CPU ausgeführt werden.
 Um zu bestätigen, dass die Edge TPU korrekt arbeitet,
 können wir einen weiteren Benchmark durchführen,
 aber dieses Mal mit einem Modell, welches bereits
-getestet gute Inferenzgeschwindigkeit besitzt. Wir
+getestete gute Inferenzgeschwindigkeiten besitzt. Wir
 verwenden das in \autoref{fig:ui-classification-example}
 gezeigte Modell, um Insektenbilder zu unterscheiden:
 \begin{pythoncode}
