@@ -20,5 +20,7 @@ from pygments.token import (
 
 class CustomShellStyle(Style):
     styles = {
-        Comment: "italic",
+        Comment: "italic #007ccf",
+        Generic.Prompt: "#000000",
+        Generic.Output: "#000000",
     }

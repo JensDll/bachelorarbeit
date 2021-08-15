@@ -1046,8 +1046,8 @@ def measure_performance(model):
         start = time.perf_counter()
         model.invoke()
         inference_time = (time.perf_counter() - start) * 1000
-        # Überspringe die ersten Messungenn,
-        # um den Modellen Zeit zu gegeben, vom Cache Gebrauch zu machen
+        # Überspringe die ersten Messungen,
+        # damit vom Cache Gebrauch gemacht werden kann
         if i > 10:
             result += inference_time
     return result
@@ -1071,7 +1071,7 @@ $ pip install -U pip
 $ pip install --ignore-installed numpy
 $ wget "https://raw.githubusercontent.com/JensDll\
 > /bachelorarbeit-notebooks/1.0.5/first-nn/benchmark/download.sh"
-$ # Führe das heruntergeladene Bash-Skript aus um die Modelle herunterzuladen
+$ # Führe das Bash-Skript aus um die Modelle herunterzuladen
 $ bash download.sh 1.0.5
 $ cd models
 $ python sine_benchmark.py

@@ -152,7 +152,6 @@ y = 5 + 3 * x
 \end{pythoncode}
 NumPy ist eine Python Bibliothek, die effiziente Berechnungen mit
 multidimensionalen Daten ermöglicht (z.\,B. der Vektor- und Matrixmultiplikation).
-\footnote{\url{https://numpy.org/doc/stable/user/whatisnumpy.html\#what-is-numpy}}
 Die Variable \pythoninline{x} ist ein NumPy Array mit 100 Zeilen und einer Spalte
 gefüllt mit Werten zwischen null und sechs:\footnote{
   Wann immer ein Programmausschnitt Ausgaben erzeugt, wird
@@ -194,7 +193,6 @@ die Laufzeit eines rechenintensiven Algorithmus
 \end{aquote}
 Wir können nun die zuvor generierten Daten visualisieren und verwenden hierfür
 eine weitere Python Bibliothek mit dem Namen Matplotlib:
-\footnote{\url{https://matplotlib.org/stable/index.html}}
 \begin{pythoncode}
 import matplotlib.pyplot as plt
 plt.plot(x, y, "b.")
@@ -247,8 +245,8 @@ lin_reg = LinearRegression()
 lin_reg.fit(x, y)
 \end{pythoncode}
 Wir verwenden das \pythoninline{LinearRegression} Modell von Scikit-Learn
-\footnote{\url{https://scikit-learn.org/stable/}} und rufen die \pythoninline{fit}
-Methode zusammen mit den Trainingsdaten und Sollwerten auf, um das Modell zu trainieren.
+und rufen die \pythoninline{fit} Methode zusammen
+mit den Trainingsdaten und Sollwerten auf, um das Modell zu trainieren.
 Die trainierten Parameter befinden sich in den Attributen \pythoninline{intercept_}
 und \pythoninline{coef_}:
 \begin{pyconcode}
@@ -373,8 +371,8 @@ mit TensorFlow Lite Modellen verwendet werden. Der IOT2050 benutzt
 ein Debian basiertes Grundimage und enthält ein
 Texas Instruments System-on-a-Chip zusammen mit einem ARM-64-Bit-Prozessor.
 \footnote{Mehr hardwarespezifische Informationen befinden sich in den Datenblättern zum
-  \href{https://support.industry.siemens.com/cs/document/109779016/simatic-iot2050}{IOT2050}
-  und der \href{https://coral.ai/docs/mini-pcie/datasheet/}{Google Coral Mini PCIe Karte}.}
+  IOT2050 (\url{https://support.industry.siemens.com/cs/document/109779016/simatic-iot2050})
+  und der Google Coral Mini PCIe Karte (\url{https://coral.ai/docs/mini-pcie/datasheet/}).}
 
 \section{Beschreibung des Problems}
 \label{sec:problem-description}
