@@ -271,13 +271,13 @@ model = keras.Model(inputs=input_layer, outputs=output_layer)
         nur einfach berechnen lässt, sondern auch in der Praxis bewährt hat
         und daher gut als Standardauswahl eignet. Es gibt viele
         weitere Aktivierungsfunktion, welche häufig eingesetzt werden.
-        Vier der gewöhnlichsten sind in \autoref{activation-functions}
+        Vier der gewöhnlichsten sind in \autoref{fig:activation-functions}
         zu sehen.
         \begin{figure}[h!]
           \centering
           \includegraphics[width=\wMD]{first-nn/activation-functions.pdf}
           \caption{Verschiedene Aktivierungsfunktionen \parencite[292]{book:hands-on-ml}}
-          \label{activation-functions}
+          \label{fig:activation-functions}
         \end{figure}
   \item Die letzten beiden Zeilen definieren die Ausgabeschicht und das endgültige
         Modell. Da das Ziel ist, einen einzigen Wert zu bestimmen, besitzt die letzte
@@ -983,7 +983,7 @@ plt.show()
   \includegraphics[width=\wMD]{first-nn/model-comparison.pdf}
   \caption{Ein Vergleich der Inferenzergebnisse des Keras-Modells, dem unquantisierten
   TFLite-CPU-Modell und dem quantisierten Edge-TPU-Modell}
-  \label{fig:predictions-train-set}
+  \label{fig:model-comparison}
 \end{figure}
 Es ist zu sehen, dass durch die Quantisierung keine oder nur kaum
 zu bemerkende Genauigkeitsverluste entstanden sind.
