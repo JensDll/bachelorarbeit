@@ -28,7 +28,7 @@ Zusätzlich kann die Entwicklung flexibler gestaltet werden,
 da es keine Einschränkung auf bestimmte Technologien
 und Programmiersprachen gibt. Es kann so jederzeit das
 beste Werkzeug für das zu lösende Problem ausgewählt werden.
-Der Service, welcher das Modell ausführt, könnte in Python oder \cpp{}
+Der Service, der das Modell ausführt, könnte in Python oder \cpp{}
 geschrieben sein, und obwohl es möglich ist, Benutzeroberflächen 
 in Python zu entwerfen, ist \cpp{} wahrscheinlich nicht das
 richtige Hilfsmittel für diese Aufgabe.
@@ -79,7 +79,7 @@ Die Docker-Images der in \autoref{fig:app-architecture} zu sehenden
 Services sind über Docker Hub verfügbar.
 Docker Hub ist eine Plattform zum Teilen von Docker-Images und das als Standard
 eingestellte Image-Register einer neuen Installation der Docker Software.
-Ein Image-Register enthält ein oder mehrere Image-Repositorien
+Ein Image-Register enthält ein oder mehrere Image-Repositorys
 und diese enthalten wiederum ein oder mehrere Images.
 Die folgenden Punkte fassen die wichtigsten Links zusammen:
 \begin{itemize}
@@ -93,3 +93,29 @@ Die folgenden Punkte fassen die wichtigsten Links zusammen:
 \end{itemize}
 
 \section{Herunterladen und Verbinden der Dienste}
+Um ein Image von Docker Hub herunterzuladen, wird
+der \pythoninline{docker pull} Befehl verwendet.
+Für offizielle Image-Repositorys, die sich
+auf der obersten Ebene des Docker Hub Namensraums befinden,
+nimmt dieser Befehl die folgende Form an:
+\begin{consolecode}
+$ docker pull <repository>:<tag>
+\end{consolecode}
+Es wird das Repository zusammen mit dem gewünschten Image
+in der Form eines Tags angegeben.
+Offizielle Repositorys sind ein Prinzip von Docker Hub.
+Hier befinden sich von Docker Inc. ausgewählte
+Images, die speziell geprüft, getestet,
+gut dokumentiert und sicher sein sollten.
+Die meisten populären und etablierten Anwendungen
+und Betriebssysteme haben ihre eigenen
+offiziellen Repositorys auf Docker Hub.
+Das Abrufen von Images aus inoffiziellen Repositorys
+ist im Wesentlichen dasselbe, hierfür
+muss dem Repository-Namen
+lediglich den Docker Hub Benutzernamen oder die Organisation
+vorangestellt werden.
+Der folgende Befehl lädt zum Beispiel das neuste
+Benutzeroberflächen-Image aus dem \consoleinline{coral-ml}
+Repository herunter, das der Person gehört, deren Docker Hub Kontoname
+\consoleinline{jensdll} ist:
