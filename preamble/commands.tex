@@ -8,3 +8,11 @@
 \newcommand{\wXL}{0.75\textwidth}
 \newcommand{\wXXL}{0.80\textwidth}
 \newcommand{\wXXXL}{0.85\textwidth}
+
+\makeatletter
+\renewcommand{\paragraph}{%
+  \@startsection{paragraph}{4}{\z@}%
+  {1.5ex \@plus 1ex \@minus .2ex}{-1em}%
+  {\normalfont\normalsize\bfseries}%
+}
+\makeatother

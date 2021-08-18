@@ -28,7 +28,7 @@ Zusätzlich kann die Entwicklung flexibler gestaltet werden,
 da es keine Einschränkung auf bestimmte Technologien
 und Programmiersprachen gibt. Es kann so jederzeit das
 beste Werkzeug für das zu lösende Problem ausgewählt werden.
-Der Service, der das Modell ausführt, könnte in Python oder \cpp{}
+Der Dienst, welcher das Modell ausführt, könnte in Python oder \cpp{}
 geschrieben sein, und obwohl es möglich ist, Benutzeroberflächen 
 in Python zu entwerfen, ist \cpp{} wahrscheinlich nicht das
 richtige Hilfsmittel für diese Aufgabe.
@@ -107,7 +107,7 @@ Images, die speziell geprüft, getestet,
 gut dokumentiert und sicher sein sollten.
 Die meisten populären und etablierten Anwendungen
 und Betriebssysteme haben ihre eigenen
-offiziellen Repositorys auf Docker Hub.
+offiziellen Repositorys.
 Diese sind Teil der obersten Ebene des Docker Hub Namensraums.
 Das Abrufen von Images aus inoffiziellen Repositorys
 ist im Wesentlichen dasselbe, hierfür
@@ -116,7 +116,7 @@ lediglich den Docker Hub Benutzernamen oder die Organisation
 vorangestellt werden.
 Der folgende Befehl lädt zum Beispiel das neuste
 Benutzeroberflächen-Image aus dem \consoleinline{coral-ml}
-Repository herunter, das der Person gehört, deren Docker Hub Kontoname
+Repository herunter, das der Person gehört, deren Docker Hub Benutzername
 \consoleinline{jensdll} ist:
 \begin{consolecode}
 $ docker pull jensdll/coral-ml:vue-app_latest
@@ -141,7 +141,7 @@ $ docker images
 REPOSITORY         TAG              IMAGE ID       CREATED        SIZE
 jensdll/coral-ml   vue-app_latest   3328de4e34a8   34 hours ago   126MB
 \end{consolecode}
-Dieselben Befehle können für die restlichen Services ausgeführt werden:
+Derselbe Befehl kann auch für die restlichen Services ausgeführt werden:
 \begin{consolecode}
 $ docker pull jensdll/coral-ml:mariadb_latest
 $ docker pull jensdll/coral-ml:record-api_latest
@@ -192,17 +192,15 @@ die allgemeine Beziehung zwischen Docker-Image und Container.
 \end{figure}
 
 \noindent
-Der Befehl \consoleinline{docker container create}
+Der Befehl \consoleinline{docker create}
 wird verwendet, um ein oder mehrere Container von einem Image zu erstellen
-und mit \consoleinline{docker container run} alternativ direkt zu starten.
+und mit \consoleinline{docker run} alternativ direkt zu starten.
 Nachdem ein Container erstellt wurde,
 ist dieser fest an das zugrunde liegende Image gebunden.
 Das Image kann erst dann gelöscht werden,
 wenn es keine Container mehr gibt, die dieses verwenden.
-Der Versuch, solches zu entfernen, würde zu einem Fehler führen.
-Der restliche Teil dieses Abschnitts wird sich mit den Befehlen beschäftigen,
-um die Anwendung zu starten.
-Die Docker-Images sind alle zusammen kompatibel mit der ARM64-Architektur
+Der Versuch, solches zu entfernen, führt zu einem Fehler.
+Die Docker-Images der Anwendung sind alle zusammen kompatibel mit der ARM64-Architektur
 und können daher vollständig auf einem Gerät wie dem
 Siemens SIMATIC IOT2050 ausgeführt werden.
 Das Bereitstellen einer containerisierten Anwendung ist ein zweiteiliger Prozess:
@@ -245,7 +243,7 @@ docker0           8000.0242b48f93e6   no
 Die Ausgabe zeigt zwei Netzwerkbrücken. Die erste Zeile (\consoleinline{br-2a64863b85ac})
 bezieht sich auf die neu angelegte Docker-Brücke \consoleinline{appnet}.
 Die zweite Zeile (\consoleinline{docker0}) korrespondiert mit der
-von Docker erstellte Standard-Brücke. Keine der beiden Brücken
+von Docker erstellten Standard-Brücke. Keine der beiden Brücken
 haben verbundene Geräte (\consoleinline{interfaces} Spalte).
 Wir können nun zwei Container erstellen, diese an die \consoleinline{appnet}
 Brücke anfügen und ein wenig Konnektivität testen:
@@ -255,8 +253,8 @@ $ docker run -d --network appnet --name c2 alpine sleep 1d
 \end{consolecode}
 Die vorhergehenden Befehle starten zwei Container mit Basis auf dem
 \textit{Alpine Linux} Docker-Image, welches nur rund \qty{5}{\mega\byte} groß ist,
-und führen das \consoleinline{sleep 1d} Kommando aus.
-Ein Blick in das \consoleinline{appnet} Netz offenbart nun zwei verbundene Container:
+und führen das Kommando \consoleinline{sleep 1d}  aus.
+Ein Blick in das \consoleinline{appnet} Netz offenbart zwei verbundene Container:
 \begin{consolecode}
 $ docker network inspect appnet
 [...]
@@ -302,4 +300,96 @@ PING c2 (172.18.0.3): 56 data bytes
 64 bytes from 172.18.0.3: seq=0 ttl=64 time=0.582 ms
 64 bytes from 172.18.0.3: seq=1 ttl=64 time=0.279 ms
 \end{consolecode}
-Die Namensauflösung funktioniert
+Die Namensauflösung funktioniert, Docker konnte dem Containernamen automatisch
+die richtige IP-Adresse zuordnen.
+Dies wird die Grundlage sein, wenn es darum die Teile der Anwendung zu verbinden.
+Zuerst werden die noch laufenden Container angehalten und entfernt:
+\begin{consolecode}
+$ docker stop c1 c2
+$ docker rm c1 c2
+\end{consolecode}
+Die folgenden Punkte zeigen die Befehle, mit denen
+die Anwendungscontainer erstellt werden können.
+\paragraph{Benutzeroberfläche}\mbox{}
+\begin{consolecode}
+$ docker create --network appnet -p 8000:80 \
+>   --name vue-app jensdll/coral-ml:vue-app_latest
+\end{consolecode}
+Bislang haben wir gesagt, dass Container auf
+Netzwerkbrücken nur mit anderen Containern im selben Netzwerk kommunizieren können.
+Mit Port-Mapping kann diese Eigenschaft umgangen werden. Der Befehl
+\consoleinline{-p 8000:80} weist der Docker Engine an, den
+TCP-Port 8000 des Hosts an den TCP-Port 80 des Containers weiterzuleiten.
+Die Benutzeroberfläche kann so von außerhalb über die IP-Adresse des Geräts
+an Port 8000 abgerufen werden.
+\paragraph{Datenbank}\mbox{}
+\begin{consolecode}
+$ docker create --network appnet \
+>   -e MARIADB_ROOT_PASSWORD='Pwd12345!' \
+>   --name mariadb jensdll/coral-ml:mariadb_latest
+\end{consolecode}
+Dieser Befehl erstellt die Datenbank. Über die Umgebungsvariable
+\consoleinline{MARIADB_ROOT_PASSWORD} wird das Passwort des Root-Nutzers angeben,
+welches für die spätere Verbindung der API verwendet wird.
+\paragraph{Modell API}\mbox{}
+\begin{consolecode}
+$ docker create --network appnet \
+>   -e ConnectionStrings:RecordDb=\
+> 'Server=mariadb,3306;Database=RecordDb;User Id=root;Pwd=Pwd12345!;' \
+>   --name record-api jensdll/coral-ml:record-api_latest
+\end{consolecode}
+Dieser Befehl erstellt den Container zur Datenbankkommunikation.
+In der Verbindungszeichenfolge wird das zuvor verwendete Passwort eingetragen.
+\paragraph{Proxy}\mbox{}
+\begin{consolecode}
+$ docker create --network appnet -p 80:80 \
+>   --name proxy jensdll/coral-ml:proxy_latest
+\end{consolecode}
+Der Proxy-Server muss über das öffentliche Netz vom Verbraucher aus erreichbar sein,
+weshalb ein Port-Mapping von Port 80 nach 80 angegeben wird.
+\paragraph{Node API}\mbox{}
+\begin{consolecode}
+$ docker create --network appnet \
+>   --name node-api jensdll/coral-ml:node-api_latest
+$ docker create --network appnet  \
+>   --name node-video jensdll/coral-ml:node-video_latest
+\end{consolecode}
+Diese beiden Container sind sich sehr ähnlich und dienen nur
+der internen Kommunikation. Es wird daher nur das Netzwerk und der Containername
+angegeben.
+\paragraph{Coral App}\mbox{}
+\begin{consolecode}
+$ docker create --network appnet \
+>   --device /dev/video0 --device /dev/apex_0 \
+>   --name coral-app jensdll/coral-ml:coral-app_latest
+\end{consolecode}
+Als letzter Befehl wird die Coral Anwendung erstellt.
+Der Container benötigt Zugriff auf verschiedene Hardwarekomponenten,
+dieser kann gesetzt werden durch die \consoleinline{--device} Option.
+Die \consoleinline{--device /dev/video0} Anweisung ermöglicht das Lesen
+einer Videoquelle (zum Beispiel einer angeschlossen Webcam)
+und die \consoleinline{/dev/apex_0} Gerätedatei ist der
+Google Coral Half-Mini PCIe Anschluss (vgl. \ref{fig:iot2050}).\\[12pt]
+Als letzter Schritt müssen die Container nur noch gestartet werden,
+die Startreihenfolge ist hierbei relevant:
+\begin{consolecode}
+$ docker start mariadb record-api node-api node-video vue-app proxy coral-app 
+\end{consolecode}
+Zum Beispiel muss der Proxy-Server nach den APIs aber noch vor der Coral-App
+gestartet werden. Die Anwendung sollte nun gestartet sein mit sieben Containern
+verbunden über eine lokale Netzwerkbrücke. Ein Blick auf die laufenden
+Container ergibt folgende gekürzte Ausgabe:
+\begin{consolecode}
+$ docker container ls
+CONTAINER ID   COMMAND                   STATUS         PORTS                          NAMES
+270ca2c11b2e   "dotnet RecordAPI.dll"    Up 4 minutes   80/tcp                         record-api
+19098722b243   "python3 main.py"         Up 4 minutes   7000/tcp, 7100/tcp, 7200/tcp   coral-app
+14b6ca1e7c7f   "node bundle.min.js"      Up 4 minutes   80/tcp, 8080/tcp               node-video
+6fb6af012163   "node bundle.min.js"      Up 4 minutes   80/tcp                         node-api
+c9c5901cbbb4   "/docker-entrypoint..."   Up 4 minutes   0.0.0.0:80->80/tcp             proxy
+53926b215876   "docker-entrypoint..."    Up 4 minutes   3306/tcp                       mariadb
+1eb49121c3ff   "/docker-entrypoint..."   Up 4 minutes   0.0.0.0:8000->80/tcp           vue-app
+\end{consolecode}
+
+
+
