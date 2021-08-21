@@ -993,7 +993,7 @@ zu bemerkende Genauigkeitsverluste entstanden sind.
 Die Inferenzgeschwindigkeiten der verschiedenen TFLite-Modelle
 sollen nun verglichen werden. Hierfür kann das folgende Python-Programm
 ausgeführt werden.
-Das Gerät benötigt eine funktionierende Edge TPU
+Das Gerät benötigt eine angeschlossene Edge TPU
 und das Python-Skript muss Zugriff auf
 das \pythoninline{tflite_runtime} Paket haben.
 Die Installation ist je nach Plattform eine unterschiedliche
@@ -1030,8 +1030,8 @@ def measure_performance(model):
     input_shape = input_details["shape"]
     dtype = input_details["dtype"]
 
-    # 20000 Testdaten im Bereich null bis sechs
-    test_data = rng.random(size=[20000, *input_shape], dtype=np.float32) * 6
+    # 1010 Testdaten im Bereich null bis sechs
+    test_data = rng.random(size=[1010, *input_shape], dtype=np.float32) * 6
 
     if dtype == np.int8:
         # Skaliere die Eingaben für quantisierte Modelle
@@ -1039,49 +1039,60 @@ def measure_performance(model):
         test_data = test_data / input_scale + input_zero_point
         test_data = test_data.astype(dtype)
 
-    result = 0
+    inference_times = []
+
     for i, value in enumerate(test_data):
         model.set_tensor(input_index, value)
-        # Messe die Zeit in Millisekunden
         start = time.perf_counter()
         model.invoke()
+        # Messe die Zeit in Millisekunden
         inference_time = (time.perf_counter() - start) * 1000
-        # Überspringe die ersten Messungen,
-        # damit vom Cache Gebrauch gemacht werden kann
-        if i > 10:
-            result += inference_time
-    return result
+        # Überspringe die ersten Messungen damit vom Cache Gebrauch gemacht werden kann
+        if i >= 10:
+            inference_times.append(inference_time)
+
+    return np.array(inference_times)
 
 result = measure_performance(sine_model_cpu)
-print(f"CPU Inferenzgeschwindigkeit: {result:.4f} ms")
+print(f"CPU Inferenzgeschwindigkeit: {result.sum():.4f} ms")
 result = measure_performance(sine_model_quant_cpu)
-print(f"CPU quantisierte Inferenzgeschwindigkeit: {result:.4f} ms")
+print(f"CPU quantisierte Inferenzgeschwindigkeit: {result.sum():.4f} ms")
 result = measure_performance(sine_model_tpu)
-print(f"TPU Inferenzgeschwindigkeit: {result:.4f} ms")
+print(f"TPU Inferenzgeschwindigkeit: {result.sum():.4f} ms")
 \end{pythoncode}
 Die folgenden Befehle zeigen wie der obere Benchmark durchgeführt werden kann.
 In diesem Beispiel wurde der Test auf dem Siemens SIMATIC IOT2050 \eqref{fig:iot2050}
 ausgeführt:
 \begin{consolecode}
-$ mkdir benchmark
-$ cd benchmark
+$ mkdir benchmark && cd benchmark
 $ python3 -m venv --system-site-packages env
 $ source env/bin/activate
-$ pip install -U pip
+$ pip install --upgrade pip
 $ pip install --ignore-installed numpy
-$ wget "https://raw.githubusercontent.com/JensDll\
-> /bachelorarbeit-notebooks/1.0.5/first-nn/benchmark/download.sh"
+$ wget "https://raw.githubusercontent.com/JensDll/bachelorarbeit-notebooks\
+> /2.0.1/chapters/first-neural-network/benchmark/download.sh"
 $ # Führe das Bash-Skript aus um die Modelle herunterzuladen
-$ bash download.sh 1.0.5
+$ bash download.sh 2.0.1
 $ cd models
 $ python sine_benchmark.py
-CPU Inferenzgeschwindigkeit: 492.3875 ms
-CPU quantisierte Inferenzgeschwindigkeit: 452.9881 ms
-TPU Inferenzgeschwindigkeit: 4490.2631 ms
+CPU Inferenzgeschwindigkeit: 25.1708 ms
+CPU quantisierte Inferenzgeschwindigkeit: 23.7801 ms
+TPU Inferenzgeschwindigkeit: 192.0617 ms
 \end{consolecode}
 Die Zeiten zeigen ein überraschendes Ergebnis.
 Das Modell, welches auf der Edge TPU ausgeführt wird, scheint um einiges
 langsamer zu sein als die, welche auf der CPU ausgeführt werden.
+\autoref{fig:sine_model_inference_time} zeigt die Verteilung
+der Messergebnisse eingetragenen in einem Diagramm.
+\newpage
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\wMD]{first-nn/sine_model_inference_time.pdf}
+  \caption{Ein Vergleich der Messergebnisse der Sinusmodelle
+  auf dem Siemens SIMATIC IOT2050}
+  \label{fig:sine_model_inference_time}
+\end{figure}
+\noindent
 Um zu bestätigen, dass die Edge TPU korrekt arbeitet,
 können wir einen weiteren Benchmark durchführen,
 aber dieses Mal mit einem Modell, welches bereits
@@ -1089,17 +1100,6 @@ getestet gute Inferenzgeschwindigkeit besitzt. Wir
 verwenden das in \autoref{fig:ui-classification-example}
 gezeigte Modell, um Insektenbilder zu unterscheiden:
 \begin{pythoncode}
-import time
-import tflite_runtime.interpreter as tflite
-import platform
-import numpy as np
-
-EDGETUP_LIB = {
-    "Linux": "libedgetpu.so.1",
-    "Darwin": "libedgetpu.1.dylib",
-    "Windows": "edgetpu.dll",
-}[platform.system()]
-
 # Die zu vergleichenden Modelle
 insect_model_cpu = tflite.Interpreter("mobilenet_v2_1.0_224_inat_insect_quant.tflite")
 insect_model_tpu = tflite.Interpreter(
@@ -1117,50 +1117,50 @@ def measure_performance(model):
     input_index = input_details["index"]
     input_shape = input_details["shape"][1:]
 
-    # Zufälliges Testbild
+    # Ein zufälliges Testbild
     test_data = rng.integers(low=0, high=256, size=[1, *input_shape], dtype=np.uint8)
 
-    result = 0
-    for i in range(12):
+    inference_times = []
+
+    for i in range(11):
         model.set_tensor(input_index, test_data)
-        # Messe die Zeit in Millisekunden
         start = time.perf_counter()
         model.invoke()
+        # Messe die Zeit in Millisekunden
         inference_time = (time.perf_counter() - start) * 1000
-        # Überspringe die ersten zwei Messungen
-        if i > 1:
-            result += inference_time
-    return result
+        # Überspringe die erste Messung
+        if not i == 0:
+            inference_times.append(inference_time)
+
+    return np.array(inference_times)
 
 result = measure_performance(insect_model_cpu)
-print(f"CPU Inferenzgeschwindigkeit: {result:.4f} ms")
+print(f"CPU Inferenzgeschwindigkeit: {result.sum():.4f} ms")
 result = measure_performance(insect_model_tpu)
-print(f"TPU Inferenzgeschwindigkeit: {result:.4f} ms")
+print(f"TPU Inferenzgeschwindigkeit: {result.sum():.4f} ms")
 \end{pythoncode}
-Wurden die vorherigen Befehle ausgeführt, kann auch dieser Test einfach durchgeführt
+Wurden die vorherigen Befehle ausgeführt, kann auch dieser Benchmark einfach durchgeführt
 werden:
 \begin{consolecode}
 $ python mobilenet_benchmark.py
-CPU Inferenzgeschwindigkeit: 2025.3505 ms
-TPU Inferenzgeschwindigkeit: 27.4516 ms
+CPU Inferenzgeschwindigkeit: 2025.5084 ms
+TPU Inferenzgeschwindigkeit: 27.6304 ms
 \end{consolecode}
 Die Edge TPU zeigt ein deutlich besseres Ergebnis.
-Der Gründe für die langsamere Geschwindigkeit im ersten Benchmark
-sind unklar. Es gibt Diskussionen auf dem Google Coral
+Die Gründe für die langsamere Geschwindigkeit im ersten Test
+sind unklar. Es gibt Diskussionen auf dem Google Coral Edge TPU
 GitHub Repository (wie
 \url{https://github.com/google-coral/edgetpu/issues/89}), in denen
 ähnliche Ergebnisse gezeigt werden.
 Die Edge TPU scheint für Netze mit vielen vollständig verbundenen Schichten
 langsamer zu sein als die Ausführung desselben Netzes auf der CPU.
 Wird die TPU hingegen für andere Netzarchitekturen
-eingesetzt (wie, dem \textit{Convolutional Neural Network} für \textit{Computer Vision}
-im zweiten Test), führt dies zu einer wesentlich besseren Leistung.
+eingesetzt (wie dem \textit{Convolutional Neural Network} im zweiten Test),
+führt dies zu einer wesentlich besseren Leistung.
 Ein entwickeltes Modell sollte also immer zusammen
 mit der verwendeten Hardware getestet werden, um die
 Leistungsverbesserungen abzuschätzen und das mit der besten Geschwindigkeit auszuwählen.
-Werden die oben durchgeführt Benchmarks vier weitere Male ausgeführt, ergeben sich
-die Inferenzgeschwindigkeiten wie in \autoref{tab:benchmark-results}
-zu sehen sind.
+\newpage
 \begin{table}[h!]
   \centering
   \caption{Ein Vergleich der Inferenzgeschwindigkeiten, nachdem die
@@ -1170,10 +1170,21 @@ zu sehen sind.
     \toprule
                           & \multicolumn{4}{c}{Durchlauf (\unit{\milli\second})} \\ \cmidrule(){2-5}
     Modell                & 1         & 2         & 3         & 4                \\ \midrule
-    Sinus CPU             & 490.9770  & 494.2958  & 500.0013  & 499.6144         \\
-    Sinus quantisiert CPU & 448.8091  & 458.9007  & 456.8160  & 453.6806         \\
-    Sinus Edge TPU        & 3958.7869 & 4466.2854 & 4329.7590 & 4392.6025        \\ \midrule
+    Sinus CPU             & 24.7545   & 25.1723   & 24.7554   & 25.2206          \\
+    Sinus quantisiert CPU & 22.9032   & 23.1907   & 22.7764   & 22.9355          \\
+    Sinus Edge TPU        & 239.9419  & 211.3840  & 193.9379  & 228.0987         \\ \midrule
     MobileNet V2 CPU      & 2032.3503 & 2021.8814 & 2031.3118 & 2023.9531        \\
     MobileNet V2 Edge TPU & 27.5456   & 27.4322   & 27.5093   & 27.6126          \\ \bottomrule
   \end{tabular}
 \end{table}
+\noindent
+Werden die oben durchgeführt Benchmarks vier weitere Male ausgeführt, ergeben sich
+die Inferenzgeschwindigkeiten wie in \autoref{tab:benchmark-results}
+zu sehen sind.
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\wMD]{first-nn/mobilenet_inference_time.pdf}
+  \caption{Ein Vergleich der Messergebnisse des MobileNet V2
+  Modells auf dem Siemens SIMATIC IOT2050}
+  \label{fig:mobilenet_inference_time}
+\end{figure}

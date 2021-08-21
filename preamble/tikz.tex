@@ -1,22 +1,2 @@
 \usepackage{tikz}
-
-\usetikzlibrary{positioning, calc, arrows.meta, shapes.multipart}
-
-\tikzset{
-  >=Triangle,
-  n/.style = {
-    circle, draw=black!30, line width=1pt
-  },
-  w/.style = {
-    n, fill=green!10
-  },
-  pics/nnn/.style = {
-    code = {
-      \node [circle split, draw=black!30, line width=1pt, fill=blue!10] (-n) {
-        $a$
-        \nodepart{lower}
-        $\sum$
-      };
-    }
-  }
-}
+\usetikzlibrary{positioning, calc, arrows.meta, shapes.multipart, fit}

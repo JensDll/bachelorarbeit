@@ -7,9 +7,9 @@ Künstliche Intelligenz (kurz KI) ist jedoch schon lange nicht mehr nur eine fut
 Fantasie und Teil von Science-Fiction-Filmen; es wird bereits großflächig
 eingesetzt und findet Verwendung in einer Vielzahl von Anwendungen aus Bereichen
 in nahe zu allen Teilen der Wirtschaft. Andrew Ng,
-welcher unteranderem durch seine beliebten Onlinekurse zum Thema
-Maschinellen Lernen (ML) und Deep Learning (DL)
-bekannt ist,
+welcher durch seine Arbeit und beliebten Onlinekurse
+in dem Gebiet Maschinellen Lernen (ML) und Deep Learning (DL)
+sehr bekannt ist,
 \footnote{\url{https://www.coursera.org/instructor/andrewng}}
 vergleicht KI mit der neuen Elektrizität.
 \begin{aquote}{Andrew Ng \parencite{online:ai-andrew-ng}}
@@ -25,7 +25,7 @@ Die Rede ist von dem E-Mail-Spamfilter \parencite[1]{book:hands-on-ml}.
 Es handelt sich um eine scheinbar einfache Aufgabe, welche
 mit traditioneller Programmierung aber dennoch nur schwer gelöst werden kann.
 Ein klassisches Programm besteht aus vielen statischen Regeln,
-im Fall des Spamfilters können diese dazu dienen, auffällige Schlüsselwörter und
+im Falle des Spamfilters könnten diese dazu dienen, auffällige Schlüsselwörter und
 Satzteile zu erkennen (wie \enquote{Kreditkarte}, \enquote{konstenlos}, \enquote{kaufen} oder
 andere Merkmale).
 Ein statisches Programm ist nicht gut dafür geeignet, ein dynamisches Problem
@@ -36,9 +36,8 @@ welcher auf Maschinellen Lernen basiert, kann diese Regeln
 selbstständig erkennen und automatisch anpassen wenn es eine Veränderung erkennt.
 Der Algorithmus durchläuft eine Trainingsphase und verwendet dabei
 Beispiel E-Mails (z.\,B. diese, die vom Benutzer markiert wurden)
-und kann so lernen Spamnachrichten zu unterscheiden.
-Diese Trainingsdaten werden als Trainingsdatensatz (engl. \textit{train set})
-bezeichnet.
+und kann so erlernen, Spamnachrichten zu unterscheiden.
+Diese Beispielsdaten werden als Trainingsdatensatz bezeichnet.
 Es folgt ein Programm, welches weitaus kürzer,
 einfacher zu verwalten und wahrscheinlich auch präziser ist.
 
@@ -83,8 +82,8 @@ Kriterien \parencite[7]{book:hands-on-ml}:
         Dieser Unterschied nennt sich instanzbasiertes und modellbasiertes Lernen.
 \end{itemize}
 Keine der eben beschriebenen Kriterien schließen sich aus.
-In einem echten System können
-kombinierte Lernmethoden sinnvoll sein, um das gewünschte Ergebnis zu erzielen.
+In einem echten System kann das geschickte Kombinieren der
+Lernmethoden helfen, das gewünschte Ergebnis zu erreichen.
 Wir können nun die einzelnen Lernmethoden etwas genauer untersuchen.
 
 \subsection{Überwachtes und Unüberwachtes Lernen}
@@ -94,7 +93,7 @@ sich darin, in welcher Form die Trainingsdaten vorliegen.
 sind. Diese Werte werden als Label bezeichnet. Unüberwachtes Lernen
 kann auch mit unbeschrifteten Daten umgehen, jedoch sind die Ziele
 der beiden Verfahren meist unterschiedliche.
-Labels können wie im Falle des
+Beschriftungen können wie im Falle des
 Spamfilters vom Benutzer stammen oder durch Naturgesetzte und Expertenwissen
 gegeben sein. Obwohl die große Mehrheit der heutigen Daten unbeschriftet sind,
 beschäftigen sich die meisten Algorithmen mit überwachten Lernen
@@ -103,7 +102,7 @@ Die Erstellung eines ausreichend großen, beschrifteten Datensatzes
 ist eine der größten Herausforderungen im Maschinellen Lernen.
 
 \subsection{Batch-Learning und Online-Learning}
-Ein weiterer Punkt, anhand dessen ein System unterschieden
+Ein weiterer Punkt, anhand dessen ein System abgegrenzt
 werden kann, ist die Methode, wie es Daten verarbeitet \parencite[15]{book:hands-on-ml}.
 Dieser Unterschied nennt sich Batch- und Online-Learning.
 Beim Batch-Learning werden die Daten stapelweise verarbeitet.
@@ -125,9 +124,9 @@ verarbeitet werden können. Online-Learning eignet sich also gut,
 um kontinuierliche Daten zu analysieren (z.\,B. Aktienkurse)
 
 \subsection{Instanzbasiertes Lernen}
-Die wohl leichteste Form des Lernens ist das einfache auswendig Lernen.
+Die wohl einfachste Form des Trainings ist das bloße auswendig Lernen.
 Ein Spamfilter, der nach diesem Prinzip arbeitet, würde jede E-Mail,
-die identisch zu einer bereits zuvor markieren E-Mail ist erneut als Spam markieren.
+die identisch zu einer bereits gekennzeichneten E-Mail ist, erneut als Spam markieren.
 Dieses Prinzip nennt sich instanzbasiertes Lernen. Um das System zu
 verbessern, könnte der Algorithmus versuchen, nicht nur gleiche,
 sondern auch ähnliche E-Mails zu erkennen.
@@ -141,7 +140,8 @@ prognostiziert werden sollen, sondern numerische Werte wie
 der Preis eines Autos? Dieses Problem nennt sich Regression und
 ist eine modellbasierte Lernaufgabe.
 Ein Beispiel soll zeigen, wie das Prinzip funktioniert.
-Das Ziel ist einfaches Modell, welches linear aussehende Daten modelliert.
+Das Ziel ist es, ein einfaches Modell zu entwerfen,
+welches linear aussehende Daten modelliert.
 Als erster Schritt müssen die Trainingsdaten generiert werden.
 Der folgende Python Code zeigt diesen Vorgang mithilfe von NumPy:
 \begin{pythoncode}
@@ -150,10 +150,10 @@ rng = np.random.default_rng(42)
 x = 6 * rng.random((100, 1))
 y = 5 + 3 * x
 \end{pythoncode}
-NumPy ist eine Python Bibliothek, die effiziente Berechnungen mit
+NumPy ist eine Python Bibliothek, welche das effiziente Rechnen mit
 multidimensionalen Daten ermöglicht (z.\,B. der Vektor- und Matrixmultiplikation).
 Die Variable \pythoninline{x} ist ein NumPy Array mit 100 Zeilen und einer Spalte
-gefüllt mit Werten zwischen null und sechs:\footnote{
+gefüllt mit Werten zwischen null und sechs: \footnote{
   Wann immer ein Programmausschnitt Ausgaben erzeugt, wird
   dieser zur besseren Unterscheidung von Code und Ausgabe in der Python Kommandozeile
   (\pythoninline{>>>} und \pythoninline{...}) angegeben.
@@ -211,8 +211,8 @@ Die hieraus resultierende Grafik ist in \autoref{plot:linear-data} zu sehen.
 \end{figure}
 
 \noindent
-Die Daten sehen sehr gerade aus, damit das Problem nicht zu einfach ist
-addieren auf Seiten der $y$-Werte zufälliges Rauschen:
+Die Daten sehen sehr linear aus, damit das Problem nicht zu einfach ist,
+addieren wir aufseiten der $y$ Werte zufälliges Rauschen:
 \begin{pythoncode}
 y += 3 * rng.standard_normal((100, 1))
 \end{pythoncode}
@@ -245,7 +245,7 @@ lin_reg = LinearRegression()
 lin_reg.fit(x, y)
 \end{pythoncode}
 Wir verwenden das \pythoninline{LinearRegression} Modell von Scikit-Learn
-und rufen die \pythoninline{fit} Methode zusammen
+und rufen die Methode \pythoninline{fit} zusammen
 mit den Trainingsdaten und Sollwerten auf, um das Modell zu trainieren.
 Die trainierten Parameter befinden sich in den Attributen \pythoninline{intercept_}
 und \pythoninline{coef_}:
@@ -253,10 +253,9 @@ und \pythoninline{coef_}:
 >>> lin_reg.intercept_, lin_reg.coef_
 (array([4.84609918]), array([[3.03831479]]))
 \end{pyconcode}
-Nicht schlecht, das Modell vermutet $\yhat = 4.85 + 3.04x_1$, wobei die ursprünglich
+Nicht schlecht: Das Modell vermutet $\yhat = 4.85 + 3.04x_1$, wobei die ursprünglich
 Funktion $y = 5 + 3x_1 + r$ war. Die genauen Werte konnten aufgrund des Rauschens
-nicht wiedergewonnen werden. Die Regressionsgerade ist
-in \autoref{plot:linear-data-prediction} zu sehen.
+nicht wiedergewonnen werden. Die Regressionsgerade sieht nun wie folgt aus:
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\wMD]{einleitung/linear-data-prediction.pdf}
@@ -302,11 +301,10 @@ Die folgenden Punkte begründen diese Vermutung \parencite[280]{book:hands-on-ml
         \input{chapters/einleitung/tikz/train-circle.tex}
 
         \noindent
-        Dieser Ablauf ist in \autoref{fig:nn-training-process} zu sehen.
         Geht das Training schnell, kann dieser Kreislauf öfter durchlaufen
         werden und es wird ein besseres Ergebnis erzielt.
-  \item Von Spracherkennung bis hin zum autonomen Fahren,
-        es gibt bereits viele hervorragende Anwendungen, welche zeigen,
+  \item Von der Spracherkennung bis hin zum autonomen Fahren,
+        es gibt bereits viele hervorragende Anwendungen, die zeigen,
         wie gut Deep Learning funktioniert, um komplexe Probleme zu lösen.
 \end{itemize}
 Der Versuch, ein neuronales Netz von Beginn an neu aufzubauen,
@@ -338,7 +336,7 @@ Solch ein großes Modell braucht lange, um es herunterzuladen,
 verwendet viel RAM und CPU und all dies macht die Anwendung langsam,
 erhitzt das Gerät und verbraucht schnell die Batterie \parencite[685]{book:hands-on-ml}.
 Es wird eine Lösung benötigt, die ein Modell mobilfreundlich,
-effizient und kleiner macht, ohne dabei zu viel Genauigkeit einzubüßen.
+effizient und klein macht, ohne dabei zu viel Genauigkeit einzubüßen.
 Die TensorFlow Lite Bibliothek (TFLite)
 bietet verschiedene Werkzeuge an, um ein Modell auf mobilen und eingebetteten
 Systemen bereitzustellen, mit den folgenden drei Zielen \parencite[685]{book:hands-on-ml}:
@@ -379,7 +377,7 @@ Texas Instruments System-on-a-Chip zusammen mit einem ARM-64-Bit-Prozessor.
 Zu Beginn der Arbeit stellte sich der Autor die Frage:
 \enquote{Wie kann ein System entwickelt werden, mit dem verschiedene DL-Modelle
   verwaltet werden können, welches modular und einfach erweiterbar ist
-  und über gemeinsame Schnittstellen im Netz kommuniziert?}
+  und Modellergebnisse über gemeinsame Schnittstellen im Netz kommuniziert?}
 Das System soll gut zusammen mit der Idee des Internets der Dinge
 (engl. Internet of Things, IoT) integriert werden können.
 Die Modularität ist deshalb wichtig, da auch IoT aus vielen vernetzten
@@ -431,7 +429,7 @@ TFLite-Modell (basierend auf der MobileNetV2 Architektur),
 welches in der Lage ist, 1000 unterschiedliche
 Insektenbilder zu unterscheiden. Das ausgewählte Bild zeigt
 einen Marienkäfer, weiter unten ist zu sehen, dass dieser durch das Modell mit
-einer Wahrscheinlichkeit von \qty{96.86}{\percent} richtig erkannt wurde.
-Die Inferenzgeschwindigkeit beträgt \qty{3.98}{\milli\second}.
+einer Wahrscheinlichkeit von \qty{96.09}{\percent} richtig erkannt wurde.
+Die Inferenzgeschwindigkeit beträgt \qty{3.11}{\milli\second}.
 Eine genauere Untersuchung der entwickelten Anwendung wird
 in \autoref{chap:application} vorgenommen.

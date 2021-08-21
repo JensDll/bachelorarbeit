@@ -168,14 +168,14 @@ Der Download der restlichen Dienste sollte nun abgeschlossen sein.
 Ein erneuter Blick auf die verfügbaren Images führt zu folgendem Ergebnis:
 \begin{consolecode}
 $ docker images
-REPOSITORY         TAG                 IMAGE ID       CREATED        SIZE
-jensdll/coral-ml   coral-app_latest    c2959681e30a   34 hours ago   1.03GB
-jensdll/coral-ml   vue-app_latest      3328de4e34a8   35 hours ago   126MB
-jensdll/coral-ml   record-api_latest   1fd5e92ee8d7   41 hours ago   216MB
-jensdll/coral-ml   node-api_latest     036704cdf24a   42 hours ago   194MB
-jensdll/coral-ml   node-video_latest   9ab53282a6e5   42 hours ago   172MB
-jensdll/coral-ml   mariadb_latest      095240b0f601   42 hours ago   743MB
-jensdll/coral-ml   proxy_latest        7587beca2048   42 hours ago   126MB
+REPOSITORY         TAG                 IMAGE ID       CREATED             SIZE
+jensdll/coral-ml   vue-app_latest      ca8f49bae427   About an hour ago   126MB
+jensdll/coral-ml   record-api_latest   bfb1e0f29b8b   About an hour ago   216MB
+jensdll/coral-ml   coral-app_latest    8c9e9d79a019   About an hour ago   1.51GB
+jensdll/coral-ml   node-api_latest     747e9d9c033c   About an hour ago   194MB
+jensdll/coral-ml   node-video_latest   f184084a9639   About an hour ago   172MB
+jensdll/coral-ml   mariadb_latest      0a215d70439a   About an hour ago   743MB
+jensdll/coral-ml   proxy_latest        2ee77b530075   About an hour ago   126MB
 \end{consolecode}
 
 \section{Die Dienste Starten und Verbinden}
@@ -192,21 +192,21 @@ die allgemeine Beziehung zwischen Docker-Image und Container.
 \end{figure}
 
 \noindent
-Der Befehl \consoleinline{docker create}
-wird verwendet, um ein oder mehrere Container von einem Image zu erstellen
-und mit \consoleinline{docker run} alternativ direkt zu starten.
+Die Befehle \consoleinline{docker run}, \consoleinline{docker service create}
+und \consoleinline{docker create + docker start} werden verwendet,
+um ein oder mehrere Container von einem Image zu starten.
 Nachdem ein Container erstellt wurde,
 ist dieser fest an das zugrunde liegende Image gebunden.
 Das Image kann erst dann gelöscht werden,
 wenn es keine Container mehr gibt, die dieses verwenden.
-Der Versuch, solches zu entfernen, führt zu einem Fehler.
+Der Versuch, ein Image mit noch verbundenen Containern zu entfernen, führe zu einem Fehler.
 Die Docker-Images der Anwendung sind alle zusammen kompatibel mit der ARM64-Architektur
 und können daher vollständig auf einem Gerät wie dem
 Siemens SIMATIC IOT2050 ausgeführt werden.
 Das Bereitstellen einer containerisierten Anwendung ist ein zweiteiliger Prozess:
 \begin{enumerate}
   \item Erstelle ein Netzwerk über das die Container kommunizieren.
-  \item Lege die Container an und starte und verbinde sie mit dem Netzwerk.
+  \item Lege die Container an, starte und verbinde sie mit dem Netzwerk.
 \end{enumerate}
 Wird die Anwendung auf einem einzelnen Host ausgeführt, bietet sich
 die einfachste Form der Docker-Netzwerke an: dem \textit{single-host bridge network}.
@@ -231,9 +231,9 @@ NETWORK ID     NAME      DRIVER    SCOPE
 de8bf5113652   bridge    bridge    local
 [...]
 \end{consolecode}
-Zusätzliche wurde auf Linux eine neue \textit{Linux bridge} im Kernel angelegt.
-Diese können mit dem \consoleinline{brctl} Befehl aus dem \consoleinline{bridge-utils}
-Paket beobachtet werden:
+Zusätzlich wurde auf Linux eine neue \textit{Linux bridge} im Kernel angelegt.
+Diese können mit dem \textit{bridge control} Befehl
+aus dem \textit{bridge-utils} Paket beobachtet werden:
 \begin{consolecode}
 $ brctl show
 bridge name       bridge id           STP enabled   interfaces
@@ -245,8 +245,8 @@ bezieht sich auf die neu angelegte Docker-Brücke \consoleinline{appnet}.
 Die zweite Zeile (\consoleinline{docker0}) korrespondiert mit der
 von Docker erstellten Standard-Brücke. Keine der beiden Brücken
 haben verbundene Geräte (\consoleinline{interfaces} Spalte).
-Wir können nun zwei Container erstellen, diese an die \consoleinline{appnet}
-Brücke anfügen und ein wenig Konnektivität testen:
+Wir können nun zwei Container auf dem Netz erstellen und die
+Konnektivität testen:
 \begin{consolecode}
 $ docker run -d --network appnet --name c1 alpine sleep 1d
 $ docker run -d --network appnet --name c2 alpine sleep 1d
@@ -302,21 +302,22 @@ PING c2 (172.18.0.3): 56 data bytes
 \end{consolecode}
 Die Namensauflösung funktioniert, Docker konnte dem Containernamen automatisch
 die richtige IP-Adresse zuordnen.
-Dies wird die Grundlage sein, wenn es darum die Teile der Anwendung zu verbinden.
+Dies wird die Grundlage sein, wenn es darum die unterschiedlichen
+Teile der Anwendung zu verbinden.
 Zuerst werden die noch laufenden Container angehalten und entfernt:
 \begin{consolecode}
 $ docker stop c1 c2
 $ docker rm c1 c2
 \end{consolecode}
-Die folgenden Punkte zeigen die Befehle, mit denen
-die Anwendungscontainer erstellt werden können.
+Die Anwendungscontainer können nun erstellt werden
+und die folgenden Punkte beschreiben die nötigen Befehle.
 \paragraph{Benutzeroberfläche}\mbox{}
 \begin{consolecode}
 $ docker create --network appnet -p 8000:80 \
 >   --name vue-app jensdll/coral-ml:vue-app_latest
 \end{consolecode}
-Bislang haben wir gesagt, dass Container auf
-Netzwerkbrücken nur mit anderen Containern im selben Netzwerk kommunizieren können.
+Bislang hieß es, dass Container auf
+Netzwerkbrücken nur mit anderen Containern im selben Netz kommunizieren können.
 Mit Port-Mapping kann diese Eigenschaft umgangen werden. Der Befehl
 \consoleinline{-p 8000:80} weist der Docker Engine an, den
 TCP-Port 8000 des Hosts an den TCP-Port 80 des Containers weiterzuleiten.
@@ -354,7 +355,7 @@ $ docker create --network appnet \
 $ docker create --network appnet  \
 >   --name node-video jensdll/coral-ml:node-video_latest
 \end{consolecode}
-Diese beiden Container sind sich sehr ähnlich und dienen nur
+Die Node-Schnittstellen sind sich sehr ähnlich und dienen nur
 der internen Kommunikation. Es wird daher nur das Netzwerk und der Containername
 angegeben.
 \paragraph{Coral App}\mbox{}
@@ -375,21 +376,50 @@ die Startreihenfolge ist hierbei relevant:
 \begin{consolecode}
 $ docker start mariadb record-api node-api node-video vue-app proxy coral-app 
 \end{consolecode}
-Zum Beispiel muss der Proxy-Server nach den APIs aber noch vor der Coral-App
-gestartet werden. Die Anwendung sollte nun gestartet sein mit sieben Containern
+Zum Beispiel muss der Proxy-Container nach den APIs aber noch vor der Coral-App
+gestartet werden. Die Anwendung sollte nun ausgeführt werden mit sieben Containern
 verbunden über eine lokale Netzwerkbrücke. Ein Blick auf die laufenden
 Container ergibt folgende gekürzte Ausgabe:
 \begin{consolecode}
 $ docker container ls
 CONTAINER ID   COMMAND                   STATUS         PORTS                          NAMES
+19098722b243   "python main.py"          Up 4 minutes                                  coral-app
 270ca2c11b2e   "dotnet RecordAPI.dll"    Up 4 minutes   80/tcp                         record-api
-19098722b243   "python3 main.py"         Up 4 minutes   7000/tcp, 7100/tcp, 7200/tcp   coral-app
 14b6ca1e7c7f   "node bundle.min.js"      Up 4 minutes   80/tcp, 8080/tcp               node-video
 6fb6af012163   "node bundle.min.js"      Up 4 minutes   80/tcp                         node-api
 c9c5901cbbb4   "/docker-entrypoint..."   Up 4 minutes   0.0.0.0:80->80/tcp             proxy
 53926b215876   "docker-entrypoint..."    Up 4 minutes   3306/tcp                       mariadb
 1eb49121c3ff   "/docker-entrypoint..."   Up 4 minutes   0.0.0.0:8000->80/tcp           vue-app
 \end{consolecode}
+Die Datenbank benötigt eine kurze Zeit,
+um ein Backup wiederherzustellen.
+Es sollten solange keine Anfragen durchgeführt werden,
+da der API-Container ansonsten abstürzen könnte.
+10 bis 15 Sekunden Wartezeit sollten ausreichen, geht dennoch etwas schief,
+kann der jeweilige Container mit
+dem Befehl \consoleinline{docker restart} neu gestartet werden.
+Die Benutzeroberfläche ist nun über die IP-Adresse des Geräts
+auf Port 8000 erreichbar.
+\autoref{fig:website-on-devices} zeigt verschiedene
+Teile der Webseite und wie diese auf unterschiedlichen Endgeräten aussieht.
+\newpage
+\input{chapters/application/tikz/website-on-devices.tex}
 
-
-
+\noindent
+Neben dem in \autoref{fig:ui-classification-example} gezeigten
+Teil der Webseite zur Bildklassifizierung zeigen die
+oberen Bilder den Videostream und die Verwaltung der verfügbaren
+Modelle. Zum Zeitpunkt des Verfassens dieser Arbeit werden
+verschiedenen Klassifizierungsmodelle und Objekterkennung
+mit Video unterstützt. Bei den zu sehenden Netzen
+handelt es sich um vom Coral-Team zur Verfügung gestellte
+Demomodelle. Eine Erweiterung der Anwendung
+durch zusätzliche Netztypen sollte
+jedoch mit moderatem Aufwand möglich sein.
+Das Video wird vom Aufnahmegerät über die Schnittstelle
+an beliebig viele Verbraucher übertragen.
+Auf dem IOT2050 wird hierbei eine
+Bildwiederholrate von 10 bis \qty{15}{FPS} erreicht,
+in Anbetracht der CPU Auslastung, die durch alle
+parallel laufenden Containern entsteht,
+reicht dies zumindest für flüssiges Video.
