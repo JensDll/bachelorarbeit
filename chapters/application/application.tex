@@ -133,7 +133,7 @@ Digest: sha256:dc255cc3b2...14260180b2
 Status: Downloaded newer image for jensdll/coral-ml:vue-app_latest
 docker.io/jensdll/coral-ml:vue-app_latest
 \end{consolecode}
-Hier befinden sich alle der in \autoref{fig:app-architecture} gezeigten Dienste.
+Hier befinden sich alle Dienste der Anwendung.
 Der Befehl \consoleinline{docker images} gibt Auskunft über die zur Zeit auf dem Host
 verfügbaren Images, hier ist die neu geladene Anwendung nun zu sehen:
 \begin{consolecode}
@@ -178,7 +178,7 @@ jensdll/coral-ml   mariadb_latest      0a215d70439a   About an hour ago   743MB
 jensdll/coral-ml   proxy_latest        2ee77b530075   About an hour ago   126MB
 \end{consolecode}
 
-\section{Die Dienste Starten und Verbinden}
+\section{Starten und Verbinden der Dienste}
 Jetzt wo alle nötigen Images heruntergeladen sind, können
 sie verwendet werden um die Anwendung zu starten.
 \autoref{fig:container-image-relation} zeigt
@@ -193,7 +193,8 @@ die allgemeine Beziehung zwischen Docker-Image und Container.
 
 \noindent
 Die Befehle \consoleinline{docker run}, \consoleinline{docker service create}
-und \consoleinline{docker create + docker start} werden verwendet,
+und \consoleinline{docker create} zusammen mit
+\consoleinline{docker start} werden verwendet,
 um ein oder mehrere Container von einem Image zu starten.
 Nachdem ein Container erstellt wurde,
 ist dieser fest an das zugrunde liegende Image gebunden.
@@ -245,15 +246,14 @@ bezieht sich auf die neu angelegte Docker-Brücke \consoleinline{appnet}.
 Die zweite Zeile (\consoleinline{docker0}) korrespondiert mit der
 von Docker erstellten Standard-Brücke. Keine der beiden Brücken
 haben verbundene Geräte (\consoleinline{interfaces} Spalte).
-Wir können nun zwei Container auf dem Netz erstellen und die
-Konnektivität testen:
+Es können nun Container erstellt werden:
+Die folgenden Befehle starten zwei Container mit Basis auf dem
+\textit{Alpine Linux} Docker-Image, welches nur rund \qty{5}{\mega\byte} groß ist,
+verbinden sie mit der Brücke und führen das Kommando \consoleinline{sleep 1d} aus:
 \begin{consolecode}
 $ docker run -d --network appnet --name c1 alpine sleep 1d
 $ docker run -d --network appnet --name c2 alpine sleep 1d
 \end{consolecode}
-Die vorhergehenden Befehle starten zwei Container mit Basis auf dem
-\textit{Alpine Linux} Docker-Image, welches nur rund \qty{5}{\mega\byte} groß ist,
-und führen das Kommando \consoleinline{sleep 1d}  aus.
 Ein Blick in das \consoleinline{appnet} Netz offenbart zwei verbundene Container:
 \begin{consolecode}
 $ docker network inspect appnet
@@ -292,9 +292,9 @@ und so die Namen aller Container
 im selben Netzwerk auflösen können \parencite[160]{book:docker-dd}.
 Die folgenden Befehle testen die Verbindung:
 \begin{consolecode}
-$ # Bringe eine Shell an Container eins an
+$ # Bringe eine Shell an Container c1 an
 $ docker exec -it c1 sh
-(c1) $ # Ein Ping zu Container zwei per Name sollte funktionieren
+(c1) $ # Ein Ping zu Container c2 per Name sollte funktionieren
 (c1) $ ping c2 -c 2
 PING c2 (172.18.0.3): 56 data bytes
 64 bytes from 172.18.0.3: seq=0 ttl=64 time=0.582 ms
@@ -420,6 +420,6 @@ Das Video wird vom Aufnahmegerät über die Schnittstelle
 an beliebig viele Verbraucher übertragen.
 Auf dem IOT2050 wird hierbei eine
 Bildwiederholrate von 10 bis \qty{15}{FPS} erreicht,
-in Anbetracht der CPU Auslastung, die durch alle
+in Anbetracht der CPU Auslastung, die durch alle anderen
 parallel laufenden Containern entsteht,
 reicht dies zumindest für flüssiges Video.
