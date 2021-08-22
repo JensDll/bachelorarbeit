@@ -18,6 +18,7 @@ Das Kapitel ist gegliedert nach den folgenden Schritten:
   \item Verbessere das Modell.
   \item Konvertiere das Modell in ein mobil- und TPU-kompatibles Format.
   \item Schreibe Code, um auf dem Gerät Prognosen durchzuführen.
+  \item Vergleiche die Ergebnisse und Inferenzgeschwindigkeiten.
 \end{enumerate}
 Die Idee dieses Kapitels stammt aus Kapitel 4 des Buchs \citetitle{book:tiny-ml}
 von \textcite{book:tiny-ml} (welche involviert in der Entwicklung
@@ -235,14 +236,15 @@ trainiert wird. Der Algorithmus misst, wie stark jedes Gewicht den Fehler der
 vorherigen Schicht beeinflusst hat und versucht, diese so anzupassen,
 damit die Kostenfunktion minimiert wird.\\[8pt]
 TensorFlow und insbesondere die TensorFlow Keras API
-macht es einfach, neuronale Netze zu entwerfen und zu trainieren.
+machen es einfach, neuronale Netze zu entwerfen und zu trainieren.
 Keras ist eine High-Level Deep Learning API, welche
 von François Chollet als Teil eines Forschungsprojekts entwickelt
 wurde und seit März 2015 ein Open-Source-Projekt ist
 \parencite[295]{book:hands-on-ml}. Keras kann
 unabhängig von TensorFlow verwendet werden, es benötigt
 jedoch eine Berechnungsgrundlage (wie TensorFlow und Co.),
-mit dem die für DL erforderlichen rechenintensiven Operationen durchgeführt werden können.
+mit der die für DL erforderlichen
+rechenintensiven Operationen durchgeführt werden können.
 In dieser Arbeit wird daher ausschließlich die \pythoninline{tf.keras} API
 verwendet. Ein Modell mit Keras zu entwerfen ist unkompliziert:
 \begin{pythoncode}
@@ -271,8 +273,9 @@ model = keras.Model(inputs=input_layer, outputs=output_layer)
         nur einfach berechnen lässt, sondern auch in der Praxis bewährt hat
         und daher gut als Standardauswahl eignet. Es gibt viele
         weitere Aktivierungsfunktion, welche häufig eingesetzt werden.
-        Vier der gewöhnlichsten sind in \autoref{fig:activation-functions}
-        zu sehen.
+        Vier der Gewöhnlichsten sind in \autoref{fig:activation-functions}
+        zu sehen, wobei die Heaviside-Schwellenwertfunktion aufgrund der
+        historischen Relevanz aufgenommen wurde.
         \begin{figure}[h!]
           \centering
           \includegraphics[width=\wMD]{first-nn/activation-functions.pdf}
@@ -499,7 +502,7 @@ Es ist zu sehen, dass beide Fehler sowohl für das
 zu Beginn des Trainings stark fallen.
 Die Werte sind relativ nahe beieinander, wobei die Validierungsfehler
 teilweise stark variieren, aber auf keine Überanpassung hin deuten.
-Das Modell scheint nach etwa 100 bis 150 Epochen für beide Graphen
+Das Modell scheint nach etwa 150 bis 200 Epochen für beide Graphen
 keinen großen Fortschritt mehr zu machen, weshalb
 das Training bereits frühzeitig beendet werden könnte.
 Der Fehler auf dem \textit{validation set} wird
@@ -843,7 +846,7 @@ Die Ausgabe bestätigt, dass alle vier Schichten des Netzes
 (drei verborgene und eine Ausgabeschicht)
 auf der Edge TPU ausgeführt werden.
 
-\section{Die Modelle verwenden}
+\section{Ein Vergleich der TensorFlow Lite Modelle}
 Die soeben erstellten Modelle können nun verwendet werden, um
 Vorhersagen zu machen.
 Da die Fokussierung von TensorFlow Lite auf Geschwindigkeit
@@ -1054,30 +1057,32 @@ def measure_performance(model):
     return np.array(inference_times)
 
 result = measure_performance(sine_model_cpu)
-print(f"CPU Inferenzgeschwindigkeit: {result.sum():.4f} ms")
+print(f"CPU Inferenzgeschwindigkeit: {result.sum():.4f} ms - ({np.average(result):.4f})")
 result = measure_performance(sine_model_quant_cpu)
-print(f"CPU quantisierte Inferenzgeschwindigkeit: {result.sum():.4f} ms")
+print(
+  f"CPU quantisierte Inferenzgeschwindigkeit: {result.sum():.4f} ms - ({np.average(result):.4f})"
+)
 result = measure_performance(sine_model_tpu)
-print(f"TPU Inferenzgeschwindigkeit: {result.sum():.4f} ms")
+print(f"TPU Inferenzgeschwindigkeit: {result.sum():.4f} ms - ({np.average(result):.4f})")
 \end{pythoncode}
 Die folgenden Befehle zeigen wie der obere Benchmark durchgeführt werden kann.
 In diesem Beispiel wurde der Test auf dem Siemens SIMATIC IOT2050 \eqref{fig:iot2050}
 ausgeführt:
 \begin{consolecode}
 $ mkdir benchmark && cd benchmark
-$ python3 -m venv --system-site-packages env
-$ source env/bin/activate
+$ python3 -m venv --system-site-packages venv
+$ source venv/bin/activate
 $ pip install --upgrade pip
 $ pip install --ignore-installed numpy
 $ wget "https://raw.githubusercontent.com/JensDll/bachelorarbeit-notebooks\
-> /2.0.1/chapters/first-neural-network/benchmark/download.sh"
+> /2.0.2/chapters/first-neural-network/benchmark/download.sh"
 $ # Führe das Bash-Skript aus um die Modelle herunterzuladen
-$ bash download.sh 2.0.1
+$ bash download.sh 2.0.2
 $ cd models
 $ python sine_benchmark.py
-CPU Inferenzgeschwindigkeit: 25.1708 ms
-CPU quantisierte Inferenzgeschwindigkeit: 23.7801 ms
-TPU Inferenzgeschwindigkeit: 192.0617 ms
+CPU Inferenzgeschwindigkeit: 25.4106 ms - (0.0254)
+CPU quantisierte Inferenzgeschwindigkeit: 23.3715 ms - (0.0234)
+TPU Inferenzgeschwindigkeit: 209.9618 ms - (0.2100)
 \end{consolecode}
 Die Zeiten zeigen ein überraschendes Ergebnis.
 Das Modell, welches auf der Edge TPU ausgeführt wird, scheint um einiges
@@ -1135,16 +1140,16 @@ def measure_performance(model):
     return np.array(inference_times)
 
 result = measure_performance(insect_model_cpu)
-print(f"CPU Inferenzgeschwindigkeit: {result.sum():.4f} ms")
+print(f"CPU Inferenzgeschwindigkeit: {result.sum():.4f} ms - ({np.average(result):.4f})")
 result = measure_performance(insect_model_tpu)
-print(f"TPU Inferenzgeschwindigkeit: {result.sum():.4f} ms")
+print(f"TPU Inferenzgeschwindigkeit: {result.sum():.4f} ms - ({np.average(result):.4f})")
 \end{pythoncode}
 Wurden die vorherigen Befehle ausgeführt, kann auch dieser Benchmark einfach durchgeführt
 werden:
 \begin{consolecode}
 $ python mobilenet_benchmark.py
-CPU Inferenzgeschwindigkeit: 2025.5084 ms
-TPU Inferenzgeschwindigkeit: 27.6304 ms
+CPU Inferenzgeschwindigkeit: 2027.1982 ms - (202.7198)
+TPU Inferenzgeschwindigkeit: 26.8095 ms - (2.6810)
 \end{consolecode}
 Die Edge TPU zeigt ein deutlich besseres Ergebnis.
 Die Gründe für die langsamere Geschwindigkeit im ersten Test

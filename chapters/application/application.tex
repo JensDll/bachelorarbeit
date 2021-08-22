@@ -1,17 +1,10 @@
 \chapter{Eine Anwendung für mobiles Maschinelles Lernen}
 \label{chap:application}
-Es konnten bis hierher bereits einige Kenntnisse gewonnen
-werden. Wir haben die Grundlagen von Deep Learning untersucht
-und den Prozess beschrieben, wie mit TensorFlow und Keras
-ein neuronales Netz erstellt und trainiert werden kann.
-Das Modell wurde in ein mobil- und TPU-kompatibles Format umgewandelt
-und anschließend miteinander vergleichen.
-Hierbei konnte das Ergebnis festgehalten werden,
-dass zumindest bei kleinen Modellen und bestimmten Netzarchitekturen
-die Inferenzgeschwindigkeit
-auf der Edge TPU nicht unbedingt schneller ist als die gleiche Ausführung auf der CPU.
+Jetzt, wo ein Modell trainiert, bewertet,
+in das TensorFlow Lite Format gewandelt und verglichen wurde,
+heißt es das ausgewählte Modell in der Praxis einzusetzen.
 Ein neuronales Netz allein, welches hervorragende Prognosen
-macht, reicht jedoch nicht, um ein nützliches Produkt zu entwickeln:
+macht, reicht nicht, um ein nützliches Produkt zu entwickeln:
 Das Modell muss in einer Anwendung integriert werden, sodass
 der Benutzer oder andere Teile des Systems
 mit den Modellergebnissen interagieren können.
@@ -355,7 +348,7 @@ $ docker create --network appnet \
 $ docker create --network appnet  \
 >   --name node-video jensdll/coral-ml:node-video_latest
 \end{consolecode}
-Die Node-Schnittstellen sind sich sehr ähnlich und dienen nur
+Diese beiden APIs sind sich sehr ähnlich und dienen nur
 der internen Kommunikation. Es wird daher nur das Netzwerk und der Containername
 angegeben.
 \paragraph{Coral App}\mbox{}
@@ -367,7 +360,7 @@ $ docker create --network appnet \
 Als letzter Befehl wird die Coral Anwendung erstellt.
 Der Container benötigt Zugriff auf verschiedene Hardwarekomponenten,
 dieser kann gesetzt werden durch die \consoleinline{--device} Option.
-Die \consoleinline{--device /dev/video0} Anweisung ermöglicht das Lesen
+Die \consoleinline{/dev/video0} Anweisung ermöglicht das Lesen
 einer Videoquelle (zum Beispiel einer angeschlossen Webcam)
 und die \consoleinline{/dev/apex_0} Gerätedatei ist der
 Google Coral Half-Mini PCIe Anschluss (vgl. \ref{fig:iot2050}).\\[12pt]
@@ -407,19 +400,19 @@ Teile der Webseite und wie diese auf unterschiedlichen Endgeräten aussieht.
 
 \noindent
 Neben dem in \autoref{fig:ui-classification-example} gezeigten
-Teil der Webseite zur Bildklassifizierung zeigen die
+Ausschnitt der Webseite zur Bildklassifizierung zeigen die
 oberen Bilder den Videostream und die Verwaltung der verfügbaren
 Modelle. Zum Zeitpunkt des Verfassens dieser Arbeit werden
 verschiedenen Klassifizierungsmodelle und Objekterkennung
 mit Video unterstützt. Bei den zu sehenden Netzen
 handelt es sich um vom Coral-Team zur Verfügung gestellte
 Demomodelle. Eine Erweiterung der Anwendung
-durch zusätzliche Netztypen sollte
+durch zusätzliche Netzarchitekturen sollte
 jedoch mit moderatem Aufwand möglich sein.
 Das Video wird vom Aufnahmegerät über die Schnittstelle
 an beliebig viele Verbraucher übertragen.
 Auf dem IOT2050 wird hierbei eine
 Bildwiederholrate von 10 bis \qty{15}{FPS} erreicht,
-in Anbetracht der CPU Auslastung, die durch alle anderen
-parallel laufenden Containern entsteht,
+in Anbetracht der CPU Auslastung, welche durch die anderen
+parallel laufenden Container entsteht,
 reicht dies zumindest für flüssiges Video.
