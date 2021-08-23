@@ -7,9 +7,19 @@ Um diese Frage zu beantworten, wurden
 die Grundlagen von Deep Learning untersucht
 und den Prozess beschrieben, wie mit TensorFlow und Keras
 ein neuronales Netz erstellt und trainiert werden kann.
+Anhand dieser Überlegung konnte schließlich die Architektur einer Anwendung
+vorgestellt werden, mit der ein neuronales Netz in der Praxis eingesetzt wird.\\[8pt]
 Das Modell wurde in ein mobil- und TPU-kompatibles Format umgewandelt
 und anschließend miteinander vergleichen.
-Hierbei konnte das Ergebnis festgehalten werden,
+Hierbei konnte nach \autoref{fig:sine_model_inference_time}
+das Ergebnis festgehalten werden,
 dass zumindest bei kleinen Modellen und bestimmten Netzarchitekturen
 die Inferenzgeschwindigkeit
 auf der Edge TPU nicht unbedingt schneller ist als die gleiche Ausführung auf der CPU.
+Es wird deshalb der Entschluss gefasst, dass
+ein entwickeltes Modell immer zusammen mit der verwendeten Hardware getestet
+werden sollte, um das mit den besten Ergebnissen auszuwählen.\\[8pt]
+Die entwickelte Anwendung \eqref{fig:app-architecture} besteht aus mehreren kleinen
+Einheiten. Im Rahmen der Zielsetzung des System als ein Demoprojekt zu dienen
+wurde eine Möglichkeit gezeigt, wie diese mit Docker auf einem Gerät wie dem Siemens
+SIMATIC IOT2050 bereitgestellt wird.

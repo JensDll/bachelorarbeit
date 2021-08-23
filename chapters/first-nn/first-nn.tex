@@ -657,10 +657,10 @@ predictions = model.predict(x_test)
 
 \section{Konvertieren des Modells nach TensorFlow Lite}
 \label{sec:convert-model}
-Jetzt, wo ein Modell mit der gewünschten Qualität trainiert
-wurde, ist es Zeit, dieses zu veröffentlichen.
+Nun, wo ein Modell mit der gewünschten Qualität trainiert
+wurde, ist es Zeit, dieses umzuwandeln.
 Das Modell soll für die Verwendung auf mobilen Geräten optimiert werden
-und kompatibel mit Google Edge TPUs sein.
+und kompatibel mit der Google Edge TPU sein.
 Hierfür wird Gebrauch von der TensorFlow Lite (TFLite) Bibliothek gemacht.
 Wie in \autoref{sec:dl-mobile} untersucht,
 besteht das Hauptziel der Konvertierung darin, die Modellgröße zu verringern
@@ -671,7 +671,7 @@ model.save("sine_model.h5")
 \end{pythoncode}
 Keras verwendet das HDF5 Dateiformat
 indem alle Informationen über das gespeicherte Modell enthalten sind,
-inklusive der trainierten Gewichte und Bias-Werte und alle eingestellten
+inklusive der trainierten Gewichte, Bias-Werte und alle eingestellten
 Parameter \parencite[314]{book:hands-on-ml}.
 Anders als bei TensorFlow Lite werden durch Keras keine Optimierungsschritte
 durchgeführt.
@@ -682,7 +682,7 @@ die sich \textit{FlatBuffers} nennt.
 entwickelte Technologie, ursprünglich entworfen für die Spieleentwicklung
 und anderen leistungskritischen Anwendungen.
 \textit{FlatBuffers} können ohne Vorverarbeitung direkt in den RAM
-geladen, dies verringert die Ladezeit
+geladen werden, dies verringert die Ladezeit
 und minimiert den Speicherfußabdruck \parencite[685]{book:hands-on-ml}.
 Um ein Keras Modell als \textit{FlatBuffer} zu speichern, kann die
 \pythoninline{tf.lite.TFLiteConverter} Klasse verwendet werden:
@@ -724,7 +724,7 @@ Bitbreite hinunter bis auf 8-bit-Ganzzahlen abbildet.
 Dieser Prozess nennt sich Quantisierung
 (engl. \textit{quantization}) und führt zu einer vierfachen Verkleinerung.
 Für die Verwendung mit Edge TPUs ist dieser Schritt nicht optional,
-da sie speziell danach ausgerichtet sind,
+da sie speziell dafür ausgerichtet sind,
 mit ganzen Zahlen zu rechnen \parencite{online:models-on-edge-tpu}.
 Quantisierung kann auf zwei Weisen durchgeführt werden:
 Während dem Training (\textit{Quantization aware training})
@@ -799,7 +799,7 @@ Für größere Modelle würde eine vierfache Verkleinerung
 festgestellt werden. Das Netz ist nun vollständig
 quantisiert und kann somit restlos auf der Edge TPU
 ausgeführt werden. Davor muss das Modell aber noch kompiliert werden, dies
-geht mithilfe des \pythoninline{edgetpu_compiler}:
+geht mithilfe des \consoleinline{edgetpu_compiler}:
 \begin{consolecode}
 $ edgetpu_compiler sine_model_quant.tflite
 Edge TPU Compiler version 16.0.384591198
@@ -808,17 +808,9 @@ Started a compilation timeout timer of 180 seconds.
 Model compiled successfully in 43 ms.
 
 Input model: sine_model_quant.tflite
-Input size: 3.20KiB
 Output model: sine_model_quant_edgetpu.tflite
-Output size: 36.56KiB
-On-chip memory used for caching model parameters: 4.75KiB
-On-chip memory remaining for caching model parameters: 7.74MiB
-Off-chip memory used for streaming uncached model parameters: 0.00B
-Number of Edge TPU subgraphs: 1
-Total number of operations: 4
 Operation log: sine_model_quant_edgetpu.log
-See the operation log file for individual operation details.
-Compilation child process completed within timeout period.
+[...]
 Compilation succeeded!
 \end{consolecode}
 Das Projektverzeichnis enthält nun vier Modelldateien und eine Log-Datei:
@@ -994,24 +986,19 @@ zu bemerkende Genauigkeitsverluste entstanden sind.
 
 \section{Ein Vergleich der Inferenzgeschwindigkeiten}
 Die Inferenzgeschwindigkeiten der verschiedenen TFLite-Modelle
-sollen nun verglichen werden. Hierfür kann das folgende Python-Programm
-ausgeführt werden.
+sollen nun verglichen werden.
+Hierfür wird folgende Python-Programm ausgeführt.
 Das Gerät benötigt eine angeschlossene Edge TPU
 und das Python-Skript muss Zugriff auf
 das \pythoninline{tflite_runtime} Paket haben.
 Die Installation ist je nach Plattform eine unterschiedliche
 (siehe hierfür die Coral AI und TensorFlow Dokumentation).
+\newpage
 \begin{pythoncode}
 import time
 import tflite_runtime.interpreter as tflite
 import platform
 import numpy as np
-
-EDGETUP_LIB = {
-    "Linux": "libedgetpu.so.1",
-    "Darwin": "libedgetpu.1.dylib",
-    "Windows": "edgetpu.dll",
-}[platform.system()]
 
 # Die drei zu vergleichenden Modelle
 sine_model_cpu = tflite.Interpreter("sine_model.tflite")
@@ -1046,9 +1033,9 @@ def measure_performance(model):
 
     for i, value in enumerate(test_data):
         model.set_tensor(input_index, value)
+        # Messe die Zeit in Millisekunden
         start = time.perf_counter()
         model.invoke()
-        # Messe die Zeit in Millisekunden
         inference_time = (time.perf_counter() - start) * 1000
         # Überspringe die ersten Messungen damit vom Cache Gebrauch gemacht werden kann
         if i >= 10:
@@ -1129,9 +1116,9 @@ def measure_performance(model):
 
     for i in range(11):
         model.set_tensor(input_index, test_data)
+        # Messe die Zeit in Millisekunden
         start = time.perf_counter()
         model.invoke()
-        # Messe die Zeit in Millisekunden
         inference_time = (time.perf_counter() - start) * 1000
         # Überspringe die erste Messung
         if not i == 0:
@@ -1165,6 +1152,9 @@ führt dies zu einer wesentlich besseren Leistung.
 Ein entwickeltes Modell sollte also immer zusammen
 mit der verwendeten Hardware getestet werden, um die
 Leistungsverbesserungen abzuschätzen und das mit der besten Geschwindigkeit auszuwählen.
+Werden die oben durchgeführt Benchmarks vier weitere Male ausgeführt, ergeben sich
+die Inferenzgeschwindigkeiten wie in \autoref{tab:benchmark-results}
+zu sehen sind.
 \newpage
 \begin{table}[h!]
   \centering
@@ -1183,9 +1173,6 @@ Leistungsverbesserungen abzuschätzen und das mit der besten Geschwindigkeit aus
   \end{tabular}
 \end{table}
 \noindent
-Werden die oben durchgeführt Benchmarks vier weitere Male ausgeführt, ergeben sich
-die Inferenzgeschwindigkeiten wie in \autoref{tab:benchmark-results}
-zu sehen sind.
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\wMD]{first-nn/mobilenet_inference_time.pdf}
