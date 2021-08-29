@@ -17,7 +17,7 @@ Das Kapitel ist gegliedert nach den folgenden Schritten:
   \item Bewerte die Ergebnisse des Modells.
   \item Verbessere das Modell.
   \item Konvertiere das Modell in ein mobil- und TPU-kompatibles Format.
-  \item Schreibe Code, um auf dem Gerät Prognosen durchzuführen.
+  \item Schreibe ein Programm, um auf dem Gerät Prognosen durchzuführen.
   \item Vergleiche die Ergebnisse und Inferenzgeschwindigkeiten.
 \end{enumerate}
 Die Idee dieses Kapitels stammt aus Kapitel 4 des Buchs \citetitle{book:tiny-ml}
@@ -31,13 +31,13 @@ um ein einfaches Modell mit nur einer Ein- und Ausgabe.
 Die zu modellierenden Daten sind etwas komplexer,
 es geht um eine bekannte trigonometrische Funktion: der Sinuskurve.
 Das Ziel des Modells ist es also, durch eine Eingabe $x$
-den $y$-Wert $\sin(x)$ zu bestimmen.
+den $y$ Wert $\sin(x)$ zu bestimmen.
 In einer echten Anwendung könnte
 diese Zahl natürlich direkt ermittelt werden,
 das Beispiel soll jedoch zeigen,
 wie mit Deep Learning (und sehr kleinen Netzen)
 bereits anspruchsvollere, nicht lineare Daten gut modelliert werden können.
-Die Sinusfunktion ist in \autoref{plot:sine-curve} zu sehen.
+Die Sinusfunktion hat den folgenden Verlauf:
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\wMD]{first-nn/sine-curve.pdf}
@@ -51,8 +51,9 @@ und dabei sehr vielseitig eingesetzt werden.
 In diesem Beispiel geht es wie zuvor um ein einfaches Regressionsproblem,
 ein neuronales Netz kann genauso gut, aber auch für
 Klassifizierung, Bildanalyse, Videoanalyse, unüberwachtes Lernen und vieles mehr verwendet werden.
-Die Trainingsdaten können mit TensorFlow generiert werden und
-die Vorgehensweise ist hierbei sehr ähnlich wie mit der Verwendung von NumPy:
+Die Trainingsdaten werden mit TensorFlow generiert und
+die Vorgehensweise ist hierbei sehr ähnlich
+wie mit der Verwendung von NumPy:
 \begin{pythoncode}
 import tensorflow as tf
 import math
@@ -66,7 +67,7 @@ tf.random.shuffle(x)
 
 y = tf.math.sin(x)
 \end{pythoncode}
-Der vorhergehende Code generiert zwei Spaltenvektoren
+Der vorhergehende Programmausschnitt generiert zwei Spaltenvektoren
 (Trainingsdaten \pythoninline{x} und Label \pythoninline{y})
 mit jeweils 2000 Werten im Bereich 0 bis $2\pi$.
 Dieser Bereich nennt sich die Periode der Sinusfunktion,
@@ -87,9 +88,9 @@ y += 0.25 * tf.random.normal(y.shape)
 Um die Qualität eines Modells bewerten zu können, werden
 mehr Daten benötigt als lediglich die Trainingsbeispiele.
 Dies ist der Grund warum es für gewöhnlich mehr als nur einen
-Datensatz gibt. Eine typische Vorgehensweise ist die Aufgliederung der Daten
+Datensatz gibt. Eine typische Vorgehensweise ist die Aufgliederung
 in drei Teile: dem \textit{training}, \textit{validation} und \textit{test set}.
-Die Schritte, um ein passendes Modell für ein Problem zu finden, sind die Folgenden:
+Die Schritte, um ein passendes Netz für ein Problem zu finden, sind die Folgenden:
 \begin{enumerate}
   \item Probiere verschiedene Ideen aus und trainiere einige Modelle mithilfe des
         \textit{training set}.
@@ -117,13 +118,13 @@ Modelliert ein Algorithmus die Struktur der Trainingsdaten zu gut, dann
 ist die Rede von Überanpassung. Dies ist zu sehen
 durch die grüne Linie. Die Funktion mit sehr vielen Features
 mag die Trainingsdaten am besten beschreiben,
-schafft es aber nicht auf neue Daten zu verallgemeinern.
+schafft es aber nicht auf neue Punkte zu verallgemeinern.
 Überanpassung kann erkannt werden, wenn die Leistung des Modells am
 \textit{training set} steigt, während sie am \textit{validation set}
 sinkt. Das Gegenstück der Überanpassung ist die
-Unteranpassung. Dies zu sehen durch die blau gestreifte Linie.
+Unteranpassung. Dies ist zu sehen durch die blau gestreifte Linie.
 Das Modell (mit nur linearen Features)
-schafft es nicht die Trainingsdaten gut genug zu beschreiben.
+schafft es nicht die Datenverteilung gut genug zu beschreiben.
 Die besten Ergebnisse werden in diesem Beispiel durch die rote Linie erzeugt.
 Um die zuvor generierten Trainingsdaten aufzuteilen,
 kann die TensorFlow Methode \pythoninline{tf.split}
@@ -142,7 +143,7 @@ y_train, y_test, y_val = tf.split(y, [TRAIN_SIZE, TEST_SIZE, VAL_SIZE])
 # Verifiziere die Aufteilung, durch summieren der Größen
 assert tf.size(x_train) + tf.size(x_test) + tf.size(x_val) == SAMPLES
 \end{pythoncode}
-Die drei Datensätze können in der folgenden Abbildung farblich dargestellt werden:
+Die resultierenden Datensätze können farblich dargestellt werden:
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\wMD]{first-nn/sine-data-noise-split.pdf}
@@ -157,7 +158,7 @@ Jedes Neuron nimmt entgegen ein bis $n$ numerische Eingaben, führt einige
 einfache Berechnungen durch und produziert eine numerische Ausgabe.
 Alleine kann ein Neuron kaum die einfachsten Probleme lösen, doch zusammen
 durch Komposition und Training haben sie das Potenzial,
-die komplexe Welt verstehen.
+die komplexe Welt zu verstehen.
 Der Aufbau eines einzelnen Neuron ist in \autoref{fig:nn-neuron} zu sehen.
 \begin{figure}[h!]
   \centering
@@ -384,7 +385,7 @@ den Sollwerten abweichen.
 \section{Das Modell trainieren und bewerten}
 \label{sec:train-evaluate-model}
 Das Netz ist nun bereit um trainiert zu werden.
-Dies funktioniert den Aufruf der \pythoninline{fit} Methode:
+Dies funktioniert durch den Aufruf der \pythoninline{fit} Methode:
 \begin{pyconcode}
 >>> EPOCHS = 300
 >>> BATCH_SIZE = 16
@@ -402,8 +403,8 @@ Epoch 300/300
 63/63 [======] - 0s 3ms/step - loss: 0.2138     - mae: 0.3667
                              - val_loss: 0.2135 - val_mae: 0.3671
 \end{pyconcode}
-Wir übergeben das \textit{training set}, legen die Epochenzahl fest
-und geben eine Stapelgröße an.
+Es wird das \textit{training set} angegeben und die Epochenzahl
+und Stapelgröße festgelegt.
 Als optionales Argument wird außerdem das \textit{validation set}
 übergeben. Die Stapelgröße zeigt, wie viele Trainingsdaten betrachten werden,
 bevor die Kostenfunktion bestimmt und die Gewichte und Bias-Werte
@@ -439,7 +440,8 @@ Die Keras Ausgabe enthält weitere nützliche Informationen:
 \begin{description}[font=\normalfont, style=nextline]
 \item[\pyconinline{loss} und \pyconinline{val_loss}]
 Die Ausgabe der Kostenfunktion für das \textit{training} und \textit{validation set}.
-Es ist zu sehen das der Fehler während dem Training für beide Datensätze abnimmt,
+Es ist zu erkennen, dass der Fehler während
+dem Training für beide Datensätze abnimmt,
 was ein gutes Zeichen ist.
 \item[\pyconinline{mae} und \pyconinline{val_mae}]
 Die mittlere absolute Abweichung. Wie auch die Kostenfunktion
@@ -449,7 +451,7 @@ nach 300 Epochen ist allerdings noch immer relativ hoch.
 Angesichts der Tatsache, dass mögliche Werte ungefähr im
 Bereich $[-1, 1]$ liegen.
 Dies könnte bedeuten, dass es das Netz nicht geschafft hat, die Daten
-gut zu modellieren. Mehr Einblick kann gegeben werden, sobald
+gut zu modellieren. Mehr Einblicke können erlangt werden, sobald
 das Modell getestet und die Ergebnisse grafisch dargestellt werden.
 \end{description}
 
@@ -508,12 +510,12 @@ das Training bereits frühzeitig beendet werden könnte.
 Der Fehler auf dem \textit{validation set} wird
 am Ende jeder Epoche gemessen, während der Trainingsfehler als Durchschnittswert
 während der Epoche bestimmt wird \parencite[305]{book:hands-on-ml}.
-Dies ist der Grund, warum der Validierungsfehler
-vereinzelt kleiner als der Trainingsfehler ist, was ungewöhnlich sein sollte:
+Dies ist der Grund, warum die Validierungsfehler
+vereinzelt kleiner als die Trainingsfehler sind:
 Das Modell wurde zum Zeitpunkt der Berechnung ein wenig länger trainiert.
 
 \subsection{Grafische Darstellung der Prognosen}
-Um die Qualität des Modells weiter zu beurteilen, können einige
+Um die Qualität des Netzes weiter zu beurteilen, können einige
 Prognosen mit dem \textit{training} oder \textit{validation set}
 durchgeführt und die Ergebnisse angezeigt werden:
 \begin{pythoncode}
@@ -598,8 +600,8 @@ Epoch 300/300
 63/63 [======] - 0s 4ms/step - loss: 0.0646     - mae: 0.2027
                              - val_loss: 0.0710 - val_mae: 0.2125
 \end{pyconcode}
-Auch die Trainingskurven können nach demselben Prinzip
-generiert werden:
+Auch die Trainingskurven werden nach demselben Prinzip
+generiert:
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\wMD]{first-nn/2-metrics.pdf}
@@ -620,7 +622,7 @@ Die grafische Darstellung der Prognosen bestätigt dieses Ergebnis:
 
 \noindent
 Das Netz scheint die Daten trotz Rauschen gut beschreiben zu können.
-Die Kurve ist nicht vollständig glatt, was eine leichte Überanpassung der Trainingsdaten
+Die Kurve ist nicht vollständig glatt, was eine leichte Überanpassung
 indiziert. Möchte das Modell weiter verbessert werden,
 könnte das Training regularisiert,
 mehr Trainingsdaten gesammelt oder Rauschen beseitigt werden
@@ -657,20 +659,20 @@ predictions = model.predict(x_test)
 
 \section{Konvertieren des Modells nach TensorFlow Lite}
 \label{sec:convert-model}
-Nun, wo ein Modell mit der gewünschten Qualität trainiert
+Nun, wo die gewünschte Qualität des Netztes erreicht
 wurde, ist es Zeit, dieses umzuwandeln.
 Das Modell soll für die Verwendung auf mobilen Geräten optimiert werden
-und kompatibel mit der Google Edge TPU sein.
+und kompatibel mit der Edge TPU sein.
 Hierfür wird Gebrauch von der TensorFlow Lite (TFLite) Bibliothek gemacht.
 Wie in \autoref{sec:dl-mobile} untersucht,
 besteht das Hauptziel der Konvertierung darin, die Modellgröße zu verringern
-für schnellere Inferenz, kürzere Downloadzeiten und geringere RAM Nutzung.
+für schnellere Ausführung, kürzere Downloadzeiten und geringere RAM Nutzung.
 Zuerst wird das normale Keras Modell gespeichert:
 \begin{pythoncode}
 model.save("sine_model.h5")
 \end{pythoncode}
 Keras verwendet das HDF5 Dateiformat
-indem alle Informationen über das gespeicherte Modell enthalten sind,
+indem alle Informationen über das gespeicherte Netz enthalten sind,
 inklusive der trainierten Gewichte, Bias-Werte und alle eingestellten
 Parameter \parencite[314]{book:hands-on-ml}.
 Anders als bei TensorFlow Lite werden durch Keras keine Optimierungsschritte
@@ -684,8 +686,8 @@ und anderen leistungskritischen Anwendungen.
 \textit{FlatBuffers} können ohne Vorverarbeitung direkt in den RAM
 geladen werden, dies verringert die Ladezeit
 und minimiert den Speicherfußabdruck \parencite[685]{book:hands-on-ml}.
-Um ein Keras Modell als \textit{FlatBuffer} zu speichern, kann die
-\pythoninline{tf.lite.TFLiteConverter} Klasse verwendet werden:
+Die Umwandlung geschieht durch die
+\pythoninline{tf.lite.TFLiteConverter} Klasse:
 \begin{pythoncode}
 # Konvertierung von einem Keras Modell
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
@@ -712,15 +714,15 @@ Differenz: 20624 bytes
 \end{pyconcode}
 Das TFLite Modell ist um einiges kleiner als die ursprüngliche Datei,
 kann aber noch nicht zusammen mit der Edge TPU verwendet werden.
-Bei der vorherigen Betrachtung der Gewichte des ersten Modells
-in \autoref{sec:train-evaluate-model}, haben wir gesehen, das
-diese als \qty{32}{\bit} Gleitkommazahlen dargestellt werden.
-Eine weitere Methode, um die Größe eines Modells zu verringern,
+\autoref{sec:train-evaluate-model} hat gezeigt,
+dass die Gewichte einer Schicht als
+\qty{32}{\bit} Gleitkommazahlen dargestellt werden.
+Eine weitere Technik, um die Modellgröße zu verringern,
 ist es, diese Bitbreite zu verkürzen.
 Werden beispielsweise \qty{16}{\bit} Gleitkommazahlen verwendet,
-kann die Größe des Modells noch einmal halbiert werden.
-TensorFlow Lite kann allerdings noch weiter gehen, als dass, indem es die
-Bitbreite hinunter bis auf 8-bit-Ganzzahlen abbildet.
+kann die Dateigröße erneut Mal halbiert werden.
+TensorFlow Lite kann allerdings noch weiter gehen, als dass, indem
+alle Berechnungen als 8-Bit-Ganzzahloperationen dargestellt werden.
 Dieser Prozess nennt sich Quantisierung
 (engl. \textit{quantization}) und führt zu einer vierfachen Verkleinerung.
 Für die Verwendung mit Edge TPUs ist dieser Schritt nicht optional,
@@ -729,7 +731,7 @@ mit ganzen Zahlen zu rechnen \parencite{online:models-on-edge-tpu}.
 Quantisierung kann auf zwei Weisen durchgeführt werden:
 Während dem Training (\textit{Quantization aware training})
 und nach dem Training (\textit{Post-training quantization}).
-Die Quantisierungsschritte sind für beide Möglichkeiten ähnlich,
+Die Quantisierungsschritte sind für beide Verfahren ähnlich,
 \textit{Post-training quantization} benötigt jedoch etwas weniger Vorbereitung,
 weshalb es hier gezeigt wird.
 Quantisierung untersucht alle Gewichte des Modells, um
@@ -742,8 +744,8 @@ Eine 8-bit-Ganzzahl wird durch die folgende Gleichung ap­pro­xi­mie­rt \pare
   \label{eq:quant}
 \end{equation}
 Die Konstanten $S$ und $Z$ sind die Quantisierungsparameter.
-$S$ ist die Skalierung (engl. für \textit{scale}),
-$Z$ ist der Nullpunkt (engl. für \textit{zero point}),
+$S$ ist die Skalierung (engl. \textit{scale}),
+$Z$ ist der Nullpunkt (engl. \textit{zero point}),
 $r$ ist die reale Gleitkommazahl und $q$ ist der quantisierte Wert
 (in diesem Fall eine 8-bit-Ganzzahl).
 Das Sinusmodell kann wie folgt quantisiert werden:
@@ -777,7 +779,7 @@ save_model(tflite_model, "sine_model_quant.tflite")
 Damit neben den Gewichten und Bias-Werten auch die Aktivierungen
 quantisiert werden können, wird ein repräsentativer Datensatz benötigt.
 Dieser Schritt ist nur relevant für \textit{Post-training quantization}.
-Die Modellgröße des normalen und quantisierten Modells kann
+Die Modellgröße des quantisierten Netzes kann
 erneut verglichen werden:
 \begin{pyconcode}
 >>> sine_lite_size = os.path.getsize("sine_model.tflite")
@@ -789,7 +791,7 @@ TFLite + Quantisierung Größe: 3280 bytes
 >>> print(f"Differenz: {sine_lite_size - sine_lite_quant_size} bytes")
 Differenz: 1576 bytes
 \end{pyconcode}
-Die Größe wurde ein weiteres Mal reduziert, eine
+Die Dateigröße wurde ein weiteres Mal reduziert, eine
 vierfache Verkleinerung konnte jedoch nicht erreicht werden.
 Dies hat den Grund, da das Netz von vornherein bereits
 sehr klein ist und Gewichte und Bias-Werte neben anderen
@@ -838,7 +840,7 @@ Die Ausgabe bestätigt, dass alle vier Schichten des Netzes
 (drei verborgene und eine Ausgabeschicht)
 auf der Edge TPU ausgeführt werden.
 
-\section{Ein Vergleich der TensorFlow Lite Modelle}
+\section{Ein Vergleich der Modelle}
 Die soeben erstellten Modelle können nun verwendet werden, um
 Vorhersagen zu machen.
 Da die Fokussierung von TensorFlow Lite auf Geschwindigkeit
@@ -962,9 +964,8 @@ for value in x_test:
     output = output_scale * (output - output_zero_point) 
     sine_model_tpu_predictions.append(output)
 \end{pythoncode*}
-Nachdem das obere Programm ausgeführt wurde, können die Ergebnisse
-mit den ursprünglichen Prognosen aus \autoref{fig:predictions-train-set}
-verglichen werden:
+Das in \autoref{fig:predictions-train-set} gezeigte Diagramm kann
+durch die neuen Prognosen erweitert werden:
 \begin{pythoncode}
 plt.plot(x_test, y_test, "b.", label="Testdaten")
 plt.plot(x_test, predictions_2, "ro", label="Keras Prognose")
@@ -985,15 +986,15 @@ zu bemerkende Genauigkeitsverluste entstanden sind.
 
 
 \section{Ein Vergleich der Inferenzgeschwindigkeiten}
-Die Inferenzgeschwindigkeiten der verschiedenen TFLite-Modelle
-sollen nun verglichen werden.
-Hierfür wird folgende Python-Programm ausgeführt.
+Es bleibt zu klären, ob durch die Ausführung des Modells
+auf der Edge TPU eine Geschwindigkeitsverbesserung entsteht.
+Hierfür werden im folgenden Python-Programm die
+Inferenzgeschwindigkeiten verglichen.
 Das Gerät benötigt eine angeschlossene Edge TPU
 und das Python-Skript muss Zugriff auf
 das \pythoninline{tflite_runtime} Paket haben.
 Die Installation ist je nach Plattform eine unterschiedliche
-(siehe hierfür die Coral AI und TensorFlow Dokumentation).
-\newpage
+(siehe hierfür die Coral AI und TensorFlow Dokumentation):
 \begin{pythoncode}
 import time
 import tflite_runtime.interpreter as tflite
@@ -1003,10 +1004,8 @@ import numpy as np
 # Die drei zu vergleichenden Modelle
 sine_model_cpu = tflite.Interpreter("sine_model.tflite")
 sine_model_quant_cpu = tflite.Interpreter("sine_model_quant.tflite")
-sine_model_tpu = tflite.Interpreter(
-    "sine_model_quant_edgetpu.tflite",
-    experimental_delegates=[tflite.load_delegate(EDGETUP_LIB)],
-)
+sine_model_tpu = tflite.Interpreter("sine_model_quant_edgetpu.tflite",
+    experimental_delegates=[tflite.load_delegate(EDGETUP_LIB)])
 
 sine_model_cpu.allocate_tensors()
 sine_model_quant_cpu.allocate_tensors()
@@ -1033,7 +1032,7 @@ def measure_performance(model):
 
     for i, value in enumerate(test_data):
         model.set_tensor(input_index, value)
-        # Messe die Zeit in Millisekunden
+        # Messe die Zeit der Ausführung in Millisekunden
         start = time.perf_counter()
         model.invoke()
         inference_time = (time.perf_counter() - start) * 1000
@@ -1044,39 +1043,36 @@ def measure_performance(model):
     return np.array(inference_times)
 
 result = measure_performance(sine_model_cpu)
-print(f"CPU Inferenzgeschwindigkeit: {result.sum():.4f} ms - ({np.average(result):.4f})")
+print(f"CPU benötigt {result.sum():.4f} ms - ({np.average(result):.4f})")
 result = measure_performance(sine_model_quant_cpu)
-print(
-  f"CPU quantisierte Inferenzgeschwindigkeit: {result.sum():.4f} ms - ({np.average(result):.4f})"
-)
+print(f"CPU quantisiert benötigt {result.sum():.4f} ms - ({np.average(result):.4f})")
 result = measure_performance(sine_model_tpu)
-print(f"TPU Inferenzgeschwindigkeit: {result.sum():.4f} ms - ({np.average(result):.4f})")
+print(f"TPU benötigt {result.sum():.4f} ms - ({np.average(result):.4f})")
 \end{pythoncode}
-Die folgenden Befehle zeigen wie der obere Benchmark durchgeführt werden kann.
-In diesem Beispiel wurde der Test auf dem Siemens SIMATIC IOT2050 \eqref{fig:iot2050}
-ausgeführt:
+Die folgenden Befehle zeigen wie der obere Test durchgeführt wird.
+In diesem Beispiel wurde der Benchmark
+auf dem Siemens SIMATIC IOT2050 \eqref{fig:iot2050} ausgeführt:
 \begin{consolecode}
 $ mkdir benchmark && cd benchmark
 $ python3 -m venv --system-site-packages venv
 $ source venv/bin/activate
-$ pip install --upgrade pip
-$ pip install --ignore-installed numpy
-$ wget "https://raw.githubusercontent.com/JensDll/bachelorarbeit-notebooks\
+(venv) $ pip install --upgrade pip
+(venv) $ pip install --ignore-installed numpy
+(venv) $ wget "https://raw.githubusercontent.com/JensDll/bachelorarbeit-notebooks\
 > /2.0.2/chapters/first-neural-network/benchmark/download.sh"
-$ # Führe das Bash-Skript aus um die Modelle herunterzuladen
-$ bash download.sh 2.0.2
-$ cd models
-$ python sine_benchmark.py
-CPU Inferenzgeschwindigkeit: 25.4106 ms - (0.0254)
-CPU quantisierte Inferenzgeschwindigkeit: 23.3715 ms - (0.0234)
-TPU Inferenzgeschwindigkeit: 209.9618 ms - (0.2100)
+(venv) $ # Führe das Bash-Skript aus um die Modelle herunterzuladen
+(venv) $ bash download.sh 2.0.2
+(venv) $ cd models
+(venv) $ python sine_benchmark.py
+CPU benötigt 25.4106 ms - (0.0254)
+CPU quantisiert benötigt 23.3715 ms - (0.0234)
+TPU benötigt 209.9618 ms - (0.2100)
 \end{consolecode}
-Die Zeiten zeigen ein überraschendes Ergebnis.
-Das Modell, welches auf der Edge TPU ausgeführt wird, scheint um einiges
-langsamer zu sein als die, welche auf der CPU ausgeführt werden.
+\noindent
+Das Modell, welches die Edge TPU verwendet, scheint um einiges
+langsamer zu sein als diese, welche auf der CPU ausgeführt werden.
 \autoref{fig:sine_model_inference_time} zeigt die Verteilung
 der Messergebnisse eingetragenen in einem Diagramm.
-\newpage
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\wMD]{first-nn/sine_model_inference_time.pdf}
@@ -1084,20 +1080,21 @@ der Messergebnisse eingetragenen in einem Diagramm.
   auf dem Siemens SIMATIC IOT2050}
   \label{fig:sine_model_inference_time}
 \end{figure}
+
 \noindent
+Die Edge TPU ist zweifellos langsamer, zusätzlich
+sind die Zeiten des quantisierten Modells minimal besser.
 Um zu bestätigen, dass die Edge TPU korrekt arbeitet,
-können wir einen weiteren Benchmark durchführen,
-aber dieses Mal mit einem Modell, welches bereits
-getestet gute Inferenzgeschwindigkeit besitzt. Wir
-verwenden das in \autoref{fig:ui-classification-example}
-gezeigte Modell, um Insektenbilder zu unterscheiden:
+wird ein zweiter Benchmark durchgeführt.
+Dieses Mal aber mit einem Modell,
+welches bereits getestet wurde.
+Es wird das in \autoref{fig:ui-classification-example}
+erwähnte Netz verwendet, um Insektenbilder zu unterscheiden:
 \begin{pythoncode}
 # Die zu vergleichenden Modelle
 insect_model_cpu = tflite.Interpreter("mobilenet_v2_1.0_224_inat_insect_quant.tflite")
-insect_model_tpu = tflite.Interpreter(
-    "mobilenet_v2_1.0_224_inat_insect_quant_edgetpu.tflite",
-    experimental_delegates=[tflite.load_delegate(EDGETUP_LIB)],
-)
+insect_model_tpu = tflite.Interpreter("mobilenet_v2_1.0_224_inat_insect_quant_edgetpu.tflite",
+    experimental_delegates=[tflite.load_delegate(EDGETUP_LIB)])
 
 insect_model_cpu.allocate_tensors()
 insect_model_tpu.allocate_tensors()
@@ -1116,7 +1113,7 @@ def measure_performance(model):
 
     for i in range(11):
         model.set_tensor(input_index, test_data)
-        # Messe die Zeit in Millisekunden
+        # Messe die Zeit der Ausführung in Millisekunden
         start = time.perf_counter()
         model.invoke()
         inference_time = (time.perf_counter() - start) * 1000
@@ -1127,16 +1124,16 @@ def measure_performance(model):
     return np.array(inference_times)
 
 result = measure_performance(insect_model_cpu)
-print(f"CPU Inferenzgeschwindigkeit: {result.sum():.4f} ms - ({np.average(result):.4f})")
+print(f"CPU benötigt {result.sum():.4f} ms - ({np.average(result):.4f})")
 result = measure_performance(insect_model_tpu)
-print(f"TPU Inferenzgeschwindigkeit: {result.sum():.4f} ms - ({np.average(result):.4f})")
+print(f"TPU benötigt {result.sum():.4f} ms - ({np.average(result):.4f})")
 \end{pythoncode}
-Wurden die vorherigen Befehle ausgeführt, kann auch dieser Benchmark einfach durchgeführt
-werden:
+Wurden die vorherigen Befehle ausgeführt,
+kann auch dieses Programm einfach ausgeführt werden:
 \begin{consolecode}
-$ python mobilenet_benchmark.py
-CPU Inferenzgeschwindigkeit: 2027.1982 ms - (202.7198)
-TPU Inferenzgeschwindigkeit: 26.8095 ms - (2.6810)
+(venv) $ python mobilenet_benchmark.py
+CPU benötigt 2027.1982 ms - (202.7198)
+TPU benötigt 26.8095 ms - (2.6810)
 \end{consolecode}
 Die Edge TPU zeigt ein deutlich besseres Ergebnis.
 Die Gründe für die langsamere Geschwindigkeit im ersten Test
@@ -1152,10 +1149,9 @@ führt dies zu einer wesentlich besseren Leistung.
 Ein entwickeltes Modell sollte also immer zusammen
 mit der verwendeten Hardware getestet werden, um die
 Leistungsverbesserungen abzuschätzen und das mit der besten Geschwindigkeit auszuwählen.
-Werden die oben durchgeführt Benchmarks vier weitere Male ausgeführt, ergeben sich
-die Inferenzgeschwindigkeiten wie in \autoref{tab:benchmark-results}
+Werden die oben durchgeführten Benchmarks vier weitere Male ausgeführt,
+ergeben sich die Inferenzgeschwindigkeiten wie in \autoref{tab:benchmark-results}
 zu sehen sind.
-\newpage
 \begin{table}[h!]
   \centering
   \caption{Ein Vergleich der Inferenzgeschwindigkeiten, nachdem die
@@ -1172,7 +1168,6 @@ zu sehen sind.
     MobileNet V2 Edge TPU & 27.5456   & 27.4322   & 27.5093   & 27.6126          \\ \bottomrule
   \end{tabular}
 \end{table}
-\noindent
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\wMD]{first-nn/mobilenet_inference_time.pdf}

@@ -103,14 +103,14 @@ ist eine der größten Herausforderungen im Maschinellen Lernen.
 
 \subsection{Batch-Learning und Online-Learning}
 Ein weiterer Punkt, anhand dessen ein System abgegrenzt
-werden kann, ist die Methode, wie es Daten verarbeitet \parencite[15]{book:hands-on-ml}.
+wird, ist die Methode, wie es Daten verarbeitet \parencite[15]{book:hands-on-ml}.
 Dieser Unterschied nennt sich Batch- und Online-Learning.
 Beim Batch-Learning werden die Daten stapelweise verarbeitet.
 Das Modell bzw. die Parameter werden erst dann angepasst,
 nachdem der gesamte Stapel (Batch) das Training durchlaufen hat.
 Dies braucht in der Regel viel Zeit und Speicherkapazität, weshalb
 es typischerweise offline durchgeführt wird.
-Nachdem ein System veröffentlicht wurde, wendet es, dass an, was es gelernt hat,
+Nachdem ein System veröffentlicht wurde, wendet es, dass an was es gelernt hat,
 kann aber keine neuen Schlüsse mehr ziehen.
 Soll das System auf neue Daten reagieren, muss ein neues Modell trainiert werden.
 Das Online-Learning funktioniert anders.
@@ -143,15 +143,15 @@ Ein Beispiel soll zeigen, wie das Prinzip funktioniert.
 Das Ziel ist es, ein einfaches Modell zu entwerfen,
 welches linear aussehende Daten modelliert.
 Als erster Schritt müssen die Trainingsdaten generiert werden.
-Der folgende Python Code zeigt diesen Vorgang mithilfe von NumPy:
+Der folgende Python Ausschnitt zeigt diesen Vorgang mithilfe von NumPy:
 \begin{pythoncode}
 import numpy as np
 rng = np.random.default_rng(42)
 x = 6 * rng.random((100, 1))
 y = 5 + 3 * x
 \end{pythoncode}
-NumPy ist eine Python Bibliothek, welche das effiziente Rechnen mit
-multidimensionalen Daten ermöglicht (z.\,B. der Vektor- und Matrixmultiplikation).
+NumPy ist eine Python Bibliothek, um effiziente Berechnungen mit
+multidimensionalen Daten zu ermöglichen (z.\,B. der Vektor- und Matrixmultiplikation).
 Die Variable \pythoninline{x} ist ein NumPy Array mit 100 Zeilen und einer Spalte
 gefüllt mit Werten zwischen null und sechs: \footnote{
   Wann immer ein Programmausschnitt Ausgaben erzeugt, wird
@@ -202,17 +202,16 @@ plt.axis([0, 6, 5, 25])
 plt.show()
 \end{pythoncode}
 \noindent
-Die hieraus resultierende Grafik ist in \autoref{plot:linear-data} zu sehen.
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\wMD]{einleitung/linear-data.pdf}
-  \caption{Die generierten Daten}
+  \caption{Die Verteilung der generierten Daten}
   \label{plot:linear-data}
 \end{figure}
 
 \noindent
 Die Daten sehen sehr linear aus, damit das Problem nicht zu einfach ist,
-addieren wir aufseiten der $y$ Werte zufälliges Rauschen:
+werden aufseiten der $y$ Werte zufälliges Rauschen addiert:
 \begin{pythoncode}
 y += 3 * rng.standard_normal((100, 1))
 \end{pythoncode}
@@ -222,7 +221,7 @@ Die so modifizierten Daten sind in \autoref{plot:linear-data-noise} zu sehen.
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\wMD]{einleitung/linear-data-noise.pdf}
-  \caption{Die generierte Daten plus zufälliges Rauschen}
+  \caption{Die Verteilung der generierten Daten plus zufälliges Rauschen}
   \label{plot:linear-data-noise}
 \end{figure}
 \noindent
@@ -238,7 +237,7 @@ Daten möglichst gut beschreibt. Die Geradengleichung hat die folgende Form:
 \end{align}
 Die griechischen Buchstaben Theta $\theta_i$ beschreiben die erlernbaren Parameter und
 der Funktionswert $\yhat$ (gesprochen \enquote{y-Hut}) beschreibt die Prognose.
-Das Training kann in Python mit nur wenigen Zeilen Code durchgeführt werden:
+Das Training kann in Python mit nur wenigen Zeilen durchgeführt werden:
 \begin{pythoncode}
 from sklearn.linear_model import LinearRegression
 lin_reg = LinearRegression()
@@ -253,7 +252,7 @@ und \pythoninline{coef_}:
 >>> lin_reg.intercept_, lin_reg.coef_
 (array([4.84609918]), array([[3.03831479]]))
 \end{pyconcode}
-Nicht schlecht: Das Modell vermutet $\yhat = 4.85 + 3.04x_1$, wobei die ursprünglich
+Nicht schlecht: Das Modell vermutet $\yhat = 4.85 + 3.04x_1$, wobei die ursprüngliche
 Funktion $y = 5 + 3x_1 + r$ war. Die genauen Werte konnten aufgrund des Rauschens
 nicht wiedergewonnen werden. Die Regressionsgerade sieht nun wie folgt aus:
 \begin{figure}[h!]
@@ -274,9 +273,9 @@ inspiriert, es liegt daher nahe, die Funktionsweise des Gehirns zu
 untersuchen, um ein intelligentes System zu entwickeln.
 Der Prozess, ein neuronales Netz zu trainieren, nennt sich Deep Learning (DL).
 DL ist keine neue Idee:
-Der Neurophysiologie Warren McCulloch und der Mathematiker Walter Pitts
+Der Neurophysiologe Warren McCulloch und der Mathematiker Walter Pitts
 haben das Prinzip im Jahr 1943 erstmalig öffentlich eingeführt
-\parencite[280]{book:hands-on-ml}. Der frühe Erfolg von neuralen
+\parencite[280]{book:hands-on-ml}. Der frühe Erfolg von neuronalen
 Netzen brachte Enthusiasmus und große Erwartungen,
 doch als sich in den 70er-Jahren herausstellte, dass diese Erwartungen nicht erfüllt
 werden können, verlangsamte sich die Forschung und die finanziellen Fördermittel
@@ -288,7 +287,7 @@ Die folgenden Punkte begründen diese Vermutung \parencite[280]{book:hands-on-ml
   \item Durch die immer stärker digitalisierte Welt
         entstehen sehr große Mengen an Daten.
         Die Forschung und Praxis hat gezeigt, dass tiefe neuronale Netze umso besser funktionieren,
-        je mehr Trainingsdaten zur Verfügung stehen. Diese steht im Gegensatz
+        je mehr Trainingsdaten zur Verfügung stehen. Dies steht im Gegensatz
         zu anderen Lernverfahren, wessen Leistung ab einer bestimmten
         Datenmenge typischerweise begrenzt ist.
   \item Rechenstarke CPUs und GPUs machen es möglich,
@@ -379,11 +378,11 @@ Zu Beginn der Arbeit stellte sich der Autor die Frage:
   verwaltet werden können, welches modular und einfach erweiterbar ist
   und Modellergebnisse über gemeinsame Schnittstellen im Netz kommuniziert?}
 Das System soll gut zusammen mit der Idee des Internets der Dinge
-(engl. Internet of Things, IoT) integriert werden können.
-Die Modularität ist deshalb wichtig, da auch IoT aus vielen vernetzten
+(engl. Internet of Things, IOT) integriert werden können.
+Die Modularität ist deshalb wichtig, da auch IOT aus vielen vernetzten
 Einzelelementen besteht und das System diese Architektur widerspiegeln sollte.
-Die allgemeine Struktur einer solchen Anwendung ist \autoref{fig:general-architecture} zu
-sehen. 
+Die allgemeine Struktur einer solchen Anwendung ist in
+\autoref{fig:general-architecture} zu sehen. 
 \begin{figure}[h!]
   \centering
   \includegraphics{einleitung/general-architecture.pdf}
