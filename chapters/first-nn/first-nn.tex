@@ -1,5 +1,5 @@
-\chapter{Trainieren des ersten Neuronale Netzes}
-In dem vorherigen Kapitel haben wir gesehen,
+\chapter{Trainieren des ersten Neuronalen Netzes}
+In dem vorherigen Kapitel wurde gezeigt,
 was Maschinelles Lernen bedeutet, welche
 Probleme es hilft zu lösen und warum sich
 Deep Learning in der heutigen Zeit mehr und mehr durchsetzt.
@@ -8,7 +8,7 @@ beschrieben und einen ersten Einblick
 in die verwendete Hardware gegeben werden.
 In diesem Kapitel soll es darum gehen, die
 TensorFlow Bibliothek kennenzulernen
-und zu zeigen wie ein Deep-Learning-Modell
+und zu zeigen wie ein neuronales Netz
 für mobile Geräte (und der Google Coral Edge TPU) bereitgestellt wird.
 Das Kapitel ist gegliedert nach den folgenden Schritten:
 \begin{enumerate}
@@ -45,12 +45,13 @@ Die Sinusfunktion hat den folgenden Verlauf:
   \label{plot:sine-curve}
 \end{figure}
 
-\section{Generieren der Daten}
+\section{Generieren der Trainingsdaten}
 Neuronale Netze können komplexe Muster in den zugrundeliegenden Daten erkennen
 und dabei sehr vielseitig eingesetzt werden.
 In diesem Beispiel geht es wie zuvor um ein einfaches Regressionsproblem,
 ein neuronales Netz kann genauso gut, aber auch für
-Klassifizierung, Bildanalyse, Videoanalyse, unüberwachtes Lernen und vieles mehr verwendet werden.
+Klassifizierung, Bildanalyse, Videoanalyse,
+unüberwachtes Lernen und vieles mehr verwendet werden.
 Die Trainingsdaten werden mit TensorFlow generiert und
 die Vorgehensweise ist hierbei sehr ähnlich
 wie mit der Verwendung von NumPy:
@@ -202,7 +203,7 @@ Es wird durch einen Algorithmus trainiert, der
 sich Backpropagation nennt.
 Backpropagation ist der weitaus mathematischste Teil von
 Deep Learning, da der Schwerpunkt dieser Arbeit auf der Entwicklung einer
-Anwendung liegt, werden wir nicht im Detail untersuchen,
+Anwendung liegt, wird nicht im Detail untersucht,
 wie dieser und verwandte Algorithmen wie das Gradientenabstiegsverfahren
 funktionieren. Zusätzlich können diese Methoden durch Deep-Learning-Bibliotheken
 wie TensorFlow automatisiert werden. Es wird jedoch versucht, einige
@@ -1087,7 +1088,7 @@ sind die Zeiten des quantisierten Modells minimal besser.
 Um zu bestätigen, dass die Edge TPU korrekt arbeitet,
 wird ein zweiter Benchmark durchgeführt.
 Dieses Mal aber mit einem Modell,
-welches bereits getestet wurde.
+welches bereits getestet wurde und gut Ergebnisse zeigt.
 Es wird das in \autoref{fig:ui-classification-example}
 erwähnte Netz verwendet, um Insektenbilder zu unterscheiden:
 \begin{pythoncode}
@@ -1144,7 +1145,7 @@ GitHub Repository (wie
 Die Edge TPU scheint für Netze mit vielen vollständig verbundenen Schichten
 langsamer zu sein als die Ausführung desselben Netzes auf der CPU.
 Wird die TPU hingegen für andere Netzarchitekturen
-eingesetzt (wie dem \textit{Convolutional Neural Network} im zweiten Test),
+eingesetzt (wie dem faltenden neuronalen Netzwerk im zweiten Test),
 führt dies zu einer wesentlich besseren Leistung.
 Ein entwickeltes Modell sollte also immer zusammen
 mit der verwendeten Hardware getestet werden, um die

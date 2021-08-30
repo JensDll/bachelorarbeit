@@ -11,15 +11,18 @@ Anhand dieser Überlegung konnte schließlich die Architektur einer Anwendung
 vorgestellt werden, mit der ein neuronales Netz in der Praxis eingesetzt wird.\\[8pt]
 Das Modell wurde in ein mobil- und TPU-kompatibles Format umgewandelt
 und anschließend miteinander vergleichen.
-Hierbei konnte nach \autoref{fig:sine_model_inference_time}
-das Ergebnis festgehalten werden,
+Mit \autoref{fig:model-comparison} ist zu erkennen,
+dass hierdurch keine oder nur kaum zu bemerkende Genauigkeitsverluste
+entstanden sind.
+Jedoch wird nach \autoref{fig:sine_model_inference_time}
+das Ergebnis festgehalten,
 dass zumindest bei kleinen Modellen und bestimmten Netzarchitekturen
 die Inferenzgeschwindigkeit
 auf der Edge TPU nicht unbedingt schneller ist als die gleiche Ausführung auf der CPU.
-Es wird deshalb der Entschluss gefasst, dass
-ein entwickeltes Modell immer zusammen mit der verwendeten Hardware getestet
-werden sollte, um das mit den besten Ergebnissen auszuwählen.\\[8pt]
-Die entwickelte Anwendung \eqref{fig:app-architecture} besteht aus mehreren kleinen
+Es wird deshalb der Entschluss gefasst,
+ein entwickeltes Netz immer zusammen mit der verwendeten Hardware zu testen,
+um das mit den besten Ergebnissen auszuwählen.\\[8pt]
+Die vorgestellte Anwendung \eqref{fig:app-architecture} besteht aus mehreren kleinen
 Einheiten. Im Rahmen der Zielsetzung des System als ein Demoprojekt zu dienen
 wurde eine Möglichkeit demonstriert,
 wie diese mit Docker auf einem Gerät wie dem Siemens
@@ -27,9 +30,9 @@ SIMATIC IOT2050 bereitgestellt wird.\\[8pt]
 Weitere Forschung und Entwicklung können auf diesen Ergebnissen
 aufbauen. Es ist gut möglich die Anwendung zu erweitern oder
 auch einzelne Dienste auszuwechseln.
-Die Coral-Anwendung ist aktuell in Python geschrieben.
+Aktuell ist die Coral-Anwendung in Python geschrieben.
 Um den Mehraufwand zu reduzieren, der dadurch entsteht ein
 Python-Programm auszuführen, könnte diese in ein \cpp{}-Projekt
 umgewandelt werden.
-Dies sollte nicht nur die Leistung des Diensts verbessern, sondern
-auch die Containergröße reduzieren.
+Dies sollte nicht nur die Leistung des Dienstes verbessern, sondern
+auch die Imagegröße reduzieren.
