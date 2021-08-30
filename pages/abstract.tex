@@ -18,15 +18,16 @@ neuronale Netze auf verteilten Geräten ausgeführt
 und Netzergebnisse kommuniziert werden.
 Hierfür wird damit begonnen, die Geschichte der Künstlichen Intelligenz
 zu untersuchen, um anschließend einen Einstieg in das Gebiet
-von Deep Learning zu gegeben. Mithilfe von TensorFlow wird
+von Deep Learning zu geben. Mithilfe von TensorFlow wird
 gezeigt, wie ein neuronales Netz trainiert
 und auf mobilen und eingebetteten Geräten bereitgestellt wird.
-Des Weiteren wird hierbei die Integration mit Edge TPUs besprochen
+Des Weiteren wird hierbei die Integration mit der Edge TPU besprochen
 und Testergebnisse in Bezug auf Genauigkeit und Inferenzgeschwindigkeit
 dokumentiert. Die Ausführung auf der Edge TPU erzeugt keine
 oder nur kaum bemerkbare Genauigkeitsverluste, jedoch ist die Geschwindigkeit
 in den durchgeführten Benchmarks
 langsamer als die gleiche Ausführung auf der CPU.
+Mögliche Auslöser für dieses Ergebnis können schließlich diskutiert werden.
 \end{myabstract}
 \begin{myabstract}{english}
 This thesis deals with the development process of building
@@ -36,7 +37,12 @@ we describe a distributed system
 for querying neural networks wrapped in a service.
 We will start by examining the history of Artificial Intelligence
 and then give an introduction into the field of Deep Learning.
-With the help of TensorFlow, the process of training a simple
-neural network is shown.
+With the help of TensorFlow, we show the process of training a
+simple neural network and how to deploy the model to
+a mobile device. Moreover, both models are compared.
+Inference on the Edge TPU does not reduce the model's accuracy.
+However, when benchmarking the performance,
+the model performed slower than when running on the CPU.
+Finally, we discuss possible triggers for this behaviour.
 \end{myabstract}
 \end{abstractpage}

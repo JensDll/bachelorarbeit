@@ -1,7 +1,7 @@
 \chapter{Einleitung}
 Hören die meisten Personen die Begriffe \enquote{Künstliche Intelligenz}
 und \enquote{Maschinelles Lernen} stellen sie sich Roboter vor:
-treue Diener, die all deine Aufgaben übernehmen oder eine tödliche Arme
+treue Diener, die all deine Aufgaben übernehmen oder eine tödliche Armee
 von superintelligenten Cyborgs im Kampf gegen die Menschheit.
 Künstliche Intelligenz (kurz KI) ist jedoch schon lange nicht mehr nur eine futuristische
 Fantasie und Teil von Science-Fiction-Filmen; es wird bereits großflächig
@@ -26,8 +26,8 @@ Es handelt sich um eine scheinbar einfache Aufgabe, welche
 mit traditioneller Programmierung aber dennoch nur schwer gelöst werden kann.
 Ein klassisches Programm besteht aus vielen statischen Regeln,
 im Falle des Spamfilters könnten diese dazu dienen, auffällige Schlüsselwörter und
-Satzteile zu erkennen (wie \enquote{Kreditkarte}, \enquote{konstenlos}, \enquote{kaufen} oder
-andere Merkmale).
+Satzteile zu erkennen (wie \enquote{Kreditkarte},
+\enquote{kostenlos}, \enquote{kaufen} oder andere Merkmale).
 Ein statisches Programm ist nicht gut dafür geeignet, ein dynamisches Problem
 zu beschreiben. Die Absender der Spamnachrichten könnten erkennen, welche E-Mails blockiert werden
 und diese leicht abändern. Arbeiten sie so durchgehend um das Problem herum,
@@ -56,7 +56,7 @@ haben im Jahr 1959 und 1997 eine allgemeine und formale Definition gegeben \pare
 \end{aquote}
 Betrachten wir erneut das Beispiel des Spamfilters, dann ist die Aufgabe $T$
 das Markieren von Spam, die Erfahrung
-$E$ sind die Trainingsdaten ist und der Bewertungsmaßstab $P$ bleibt zu definieren.
+$E$ sind die Trainingsdaten und der Bewertungsmaßstab $P$ bleibt zu definieren.
 Es könnte zum Beispiel der Anteil der als richtig markierten E-Mails verwendet
 werden. Dieser Maßstab heißt Genauigkeit und wird
 häufig verwendet wenn es darum geht eine Klassifizierungsaufgabe zu bewerten.
@@ -121,7 +121,7 @@ mit sehr großen Datensätzen zu trainieren, die nicht alle gleichzeitig
 in den Speicher passen würden.
 Ein weiterer Vorteil ist der, dass neue Daten spontan auf dem Weg
 verarbeitet werden können. Online-Learning eignet sich also gut,
-um kontinuierliche Daten zu analysieren (z.\,B. Aktienkurse)
+um kontinuierliche Daten zu analysieren (z.\,B. Aktienkurse).
 
 \subsection{Instanzbasiertes Lernen}
 Die wohl einfachste Form des Trainings ist das bloße auswendig Lernen.
@@ -132,7 +132,7 @@ verbessern, könnte der Algorithmus versuchen, nicht nur gleiche,
 sondern auch ähnliche E-Mails zu erkennen.
 \subsection{Modellbasiertes Lernen}
 Das bisherige Spamfilter Beispiel ist ein typisches
-Klassifizierungsproblem. Zu einer Menge von eine Eingabewerten
+Klassifizierungsproblem. Zu einer Menge von Eingabewerten
 (auch genannt Features) soll die Wahrscheinlichkeit bestimmt werden,
 dass diese Feature zu einer bestimmten Klasse gehören.
 Was ist aber wenn keine Wahrscheinlichkeiten
@@ -215,7 +215,7 @@ werden aufseiten der $y$ Werte zufälliges Rauschen addiert:
 \begin{pythoncode}
 y += 3 * rng.standard_normal((100, 1))
 \end{pythoncode}
-Dies sollte das Problem ein wenig realistischer gestallten.
+Dies sollte das Problem ein wenig realistischer gestalten.
 Die so modifizierten Daten sind in \autoref{plot:linear-data-noise} zu sehen.
 \newpage
 \begin{figure}[h!]
@@ -264,7 +264,7 @@ nicht wiedergewonnen werden. Die Regressionsgerade sieht nun wie folgt aus:
 
 \noindent
 Der restliche Teil dieser Arbeit wird sich mit einer
-speziellen Form von KI-Modellen beschäftigen: diese sind künstliche
+speziellen Form von KI-Modellen beschäftigen: Diese sind künstliche
 neuronale Netze.
 
 \section{Neuronale Netze Vergangenheit bis Heute}
@@ -318,7 +318,7 @@ GitHub-Sterne, Verwendung in Firmen usw.) trägt den Namen TensorFlow
 Es wurde von dem Google Brain Team entwickelt und ist seit November 2015
 ein Open-Source-Projekt \parencite[376]{book:hands-on-ml}.
 Es besitzt eine ähnliche API wie NumPy und Scikit-Learn
-aus \autoref{sec:lernmethoden}, mit zusätzlicher
+aus \autoref{sec:lernmethoden} mit zusätzlicher
 GPU Unterstützung und Deep Learning Fokussierung.
 Die restlichen Beispiele dieser
 Arbeit werden die TensorFlow Bibliothek verwenden.

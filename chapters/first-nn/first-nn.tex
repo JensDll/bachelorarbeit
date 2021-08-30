@@ -660,7 +660,7 @@ predictions = model.predict(x_test)
 
 \section{Konvertieren des Modells nach TensorFlow Lite}
 \label{sec:convert-model}
-Nun, wo die gewünschte Qualität des Netztes erreicht
+Nun, wo die gewünschte Qualität des Netzes erreicht
 wurde, ist es Zeit, dieses umzuwandeln.
 Das Modell soll für die Verwendung auf mobilen Geräten optimiert werden
 und kompatibel mit der Edge TPU sein.
@@ -721,7 +721,7 @@ dass die Gewichte einer Schicht als
 Eine weitere Technik, um die Modellgröße zu verringern,
 ist es, diese Bitbreite zu verkürzen.
 Werden beispielsweise \qty{16}{\bit} Gleitkommazahlen verwendet,
-kann die Dateigröße erneut Mal halbiert werden.
+kann die Dateigröße ein erneutes Mal halbiert werden.
 TensorFlow Lite kann allerdings noch weiter gehen, als dass, indem
 alle Berechnungen als 8-Bit-Ganzzahloperationen dargestellt werden.
 Dieser Prozess nennt sich Quantisierung
@@ -780,8 +780,7 @@ save_model(tflite_model, "sine_model_quant.tflite")
 Damit neben den Gewichten und Bias-Werten auch die Aktivierungen
 quantisiert werden können, wird ein repräsentativer Datensatz benötigt.
 Dieser Schritt ist nur relevant für \textit{Post-training quantization}.
-Die Modellgröße des quantisierten Netzes kann
-erneut verglichen werden:
+Die Modellgrößen können erneut verglichen werden:
 \begin{pyconcode}
 >>> sine_lite_size = os.path.getsize("sine_model.tflite")
 >>> print(f"TFLite Größe: {sine_lite_size} bytes")
@@ -838,7 +837,7 @@ Operator                       Count      Status
 FULLY_CONNECTED                4          Mapped to Edge TPU
 \end{consolecode}
 Die Ausgabe bestätigt, dass alle vier Schichten des Netzes
-(drei verborgene und eine Ausgabeschicht)
+(Eingabe, Ausgabe und zwei verborgene Schichten)
 auf der Edge TPU ausgeführt werden.
 
 \section{Ein Vergleich der Modelle}
@@ -975,6 +974,7 @@ plt.plot(x_test, sine_model_tpu_predictions, "g+", label="Edge TPU Prognose")
 plt.legend()
 plt.show()
 \end{pythoncode}
+\newpage
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\wMD]{first-nn/model-comparison.pdf}
@@ -982,9 +982,9 @@ plt.show()
   TFLite-CPU-Modell und dem quantisierten Edge-TPU-Modell}
   \label{fig:model-comparison}
 \end{figure}
+\noindent
 Es ist zu sehen, dass durch die Quantisierung keine oder nur kaum
 zu bemerkende Genauigkeitsverluste entstanden sind.
-
 
 \section{Ein Vergleich der Inferenzgeschwindigkeiten}
 Es bleibt zu klären, ob durch die Ausführung des Modells
@@ -1073,7 +1073,7 @@ TPU benötigt 209.9618 ms - (0.2100)
 Das Modell, welches die Edge TPU verwendet, scheint um einiges
 langsamer zu sein als diese, welche auf der CPU ausgeführt werden.
 \autoref{fig:sine_model_inference_time} zeigt die Verteilung
-der Messergebnisse eingetragenen in einem Diagramm.
+der Messergebnisse eingetragen in einem Diagramm.
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\wMD]{first-nn/sine_model_inference_time.pdf}
@@ -1088,7 +1088,7 @@ sind die Zeiten des quantisierten Modells minimal besser.
 Um zu bestätigen, dass die Edge TPU korrekt arbeitet,
 wird ein zweiter Benchmark durchgeführt.
 Dieses Mal aber mit einem Modell,
-welches bereits getestet wurde und gut Ergebnisse zeigt.
+welches bereits getestet wurde und gute Ergebnisse zeigt.
 Es wird das in \autoref{fig:ui-classification-example}
 erwähnte Netz verwendet, um Insektenbilder zu unterscheiden:
 \begin{pythoncode}
